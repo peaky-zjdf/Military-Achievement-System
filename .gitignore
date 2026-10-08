@@ -1,0 +1,8 @@
+node_modules/
+server/data/
+*.zip
+*.log
+.token
+.env
+__pycache__/
+*.pyc

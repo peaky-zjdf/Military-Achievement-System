@@ -1,0 +1,380 @@
+/* ============================================
+   率土之滨军功系统 - 浅色拟态主题
+   当 html 上有 .theme-light 类时激活
+   ============================================ */
+
+/* === 浅色变量 === */
+html.theme-light {
+  --primary: #1E3A5F !important;
+  --accent: #2563EB !important;
+  --canvas: #f0f4f8 !important;
+  --ink: #1e293b !important;
+  --body: #475569 !important;
+  --muted: #94a3b8 !important;
+  --success: #059669 !important;
+  --danger: #dc2626 !important;
+  --warn: #d97706 !important;
+}
+
+/* === 浅色背景 === */
+html.theme-light body {
+  background:
+    linear-gradient(135deg, #e8edf5 0%, #f0f4f8 30%, #e2e8f0 60%, #f0f4f8 100%) !important;
+  background-attachment: fixed !important;
+  color: #475569 !important;
+}
+
+/* 移除暗色网格 */
+html.theme-light body::before {
+  background:
+    linear-gradient(rgba(37, 99, 235, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.03) 1px, transparent 1px) !important;
+  background-size: 40px 40px !important;
+}
+
+/* === 浅色滚动条 === */
+html.theme-light ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #94a3b8, #cbd5e1) !important;
+}
+html.theme-light ::-webkit-scrollbar-track {
+  background: #e2e8f0 !important;
+}
+
+/* === 浅色卡片 === */
+html.theme-light .card {
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.06),
+    0 4px 16px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+  color: #1e293b !important;
+}
+html.theme-light .card:hover {
+  border-color: rgba(37, 99, 235, 0.2) !important;
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.08),
+    0 8px 24px rgba(37, 99, 235, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+}
+
+/* === 浅色统计卡 === */
+html.theme-light .metric {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.06), rgba(99, 102, 241, 0.04)) !important;
+  backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(37, 99, 235, 0.12) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+html.theme-light .metric::before {
+  background: linear-gradient(90deg, transparent, #2563eb, transparent) !important;
+  opacity: 0.3;
+}
+html.theme-light .metric .value {
+  color: #1E3A5F !important;
+  text-shadow: none !important;
+}
+html.theme-light .metric .label {
+  color: #94a3b8 !important;
+}
+
+/* === 浅色按钮 === */
+html.theme-light .btn-primary {
+  background: linear-gradient(135deg, #2563eb, #3b82f6) !important;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3) !important;
+  text-shadow: none !important;
+}
+html.theme-light .btn-primary:hover {
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4) !important;
+}
+
+html.theme-light .btn-secondary {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #1e293b !important;
+  backdrop-filter: blur(10px) !important;
+}
+html.theme-light .btn-secondary:hover {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+}
+
+html.theme-light .btn-danger {
+  background: linear-gradient(135deg, #dc2626, #ef4444) !important;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3) !important;
+}
+html.theme-light .btn-success {
+  background: linear-gradient(135deg, #059669, #10b981) !important;
+  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3) !important;
+}
+html.theme-light .btn-warn {
+  background: linear-gradient(135deg, #d97706, #f59e0b) !important;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3) !important;
+}
+html.theme-light .btn-ghost {
+  color: #64748b !important;
+}
+html.theme-light .btn-ghost:hover {
+  background: rgba(37, 99, 235, 0.06) !important;
+  color: #2563eb !important;
+}
+
+/* === 浅色输入框 === */
+html.theme-light .input,
+html.theme-light .select,
+html.theme-light .textarea {
+  background: rgba(255, 255, 255, 0.85) !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #1e293b !important;
+  backdrop-filter: blur(10px) !important;
+}
+html.theme-light .input:focus,
+html.theme-light .select:focus,
+html.theme-light .textarea:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+}
+html.theme-light .input::placeholder,
+html.theme-light .textarea::placeholder {
+  color: #cbd5e1 !important;
+}
+
+/* === 浅色表格 === */
+html.theme-light .table-wrap {
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(16px) !important;
+  border: 1px solid #e2e8f0 !important;
+}
+html.theme-light table.data th {
+  background: #f8fafc !important;
+  color: #475569 !important;
+  border-color: #e2e8f0 !important;
+  text-transform: none;
+  font-size: 0.875rem !important;
+  letter-spacing: normal;
+}
+html.theme-light table.data td {
+  color: #334155 !important;
+  border-color: #f1f5f9 !important;
+}
+html.theme-light table.data tr:hover td {
+  background: #f8fafc !important;
+}
+
+/* === 浅色侧边栏 === */
+html.theme-light .sidebar-link {
+  color: #64748b !important;
+}
+html.theme-light .sidebar-link:hover {
+  background: rgba(37, 99, 235, 0.06) !important;
+  color: #1e293b !important;
+}
+html.theme-light .sidebar-link.active {
+  background: linear-gradient(135deg, #2563eb, #3b82f6) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3) !important;
+  border: none !important;
+}
+
+/* === 浅色标签 === */
+html.theme-light .tag-blue {
+  background: #eff6ff !important;
+  color: #1d4ed8 !important;
+  border: 1px solid #bfdbfe !important;
+}
+html.theme-light .tag-green {
+  background: #ecfdf5 !important;
+  color: #047857 !important;
+  border: 1px solid #a7f3d0 !important;
+}
+html.theme-light .tag-orange {
+  background: #fff7ed !important;
+  color: #c2410c !important;
+  border: 1px solid #fed7aa !important;
+}
+html.theme-light .tag-red {
+  background: #fef2f2 !important;
+  color: #b91c1c !important;
+  border: 1px solid #fecaca !important;
+}
+html.theme-light .tag-purple {
+  background: #f5f3ff !important;
+  color: #6d28d9 !important;
+  border: 1px solid #c4b5fd !important;
+}
+html.theme-light .tag-gray {
+  background: #f1f5f9 !important;
+  color: #475569 !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+/* === 浅色模态框 === */
+html.theme-light .modal-mask {
+  background: rgba(15, 23, 42, 0.4) !important;
+  backdrop-filter: blur(6px) !important;
+}
+html.theme-light .modal {
+  background: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(24px) !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow:
+    0 25px 50px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(0, 0, 0, 0.03) !important;
+  color: #1e293b !important;
+}
+
+/* === 浅色文字 === */
+html.theme-light .text-ink { color: #1e293b !important; }
+html.theme-light .text-body { color: #475569 !important; }
+html.theme-light .text-muted { color: #94a3b8 !important; }
+html.theme-light .text-primary { color: #1E3A5F !important; }
+html.theme-light .text-accent { color: #2563EB !important; }
+html.theme-light .text-success { color: #059669 !important; }
+html.theme-light .text-danger { color: #dc2626 !important; }
+html.theme-light .text-warn { color: #d97706 !important; }
+
+/* === 浅色背景色 === */
+html.theme-light .bg-canvas { background: transparent !important; }
+html.theme-light .bg-white { background: rgba(255, 255, 255, 0.75) !important; }
+html.theme-light .bg-slate-50 { background: #f8fafc !important; }
+html.theme-light .bg-slate-100 { background: #f1f5f9 !important; }
+html.theme-light .bg-blue-50,
+html.theme-light .bg-blue-50\/40,
+html.theme-light .bg-blue-50\/50 { background: #eff6ff !important; }
+html.theme-light .bg-emerald-50 { background: #ecfdf5 !important; }
+html.theme-light .bg-red-50,
+html.theme-light .bg-red-50\/40 { background: #fef2f2 !important; }
+html.theme-light .bg-orange-50 { background: #fff7ed !important; }
+
+/* === 浅色边框 === */
+html.theme-light .border-slate-100,
+html.theme-light .border-slate-200,
+html.theme-light .border-slate-300,
+html.theme-light .border {
+  border-color: #e2e8f0 !important;
+}
+
+/* === 浅色标签 === */
+html.theme-light .label {
+  color: #64748b !important;
+}
+
+/* === 浅色hover === */
+html.theme-light .hover\:bg-slate-100:hover,
+html.theme-light .hover\:bg-slate-50:hover {
+  background: #f8fafc !important;
+}
+html.theme-light .hover\:text-ink:hover {
+  color: #2563eb !important;
+}
+html.theme-light .hover\:border-slate-200:hover,
+html.theme-light .hover\:border-blue-300:hover,
+html.theme-light .hover\:border-blue-400:hover {
+  border-color: #93c5fd !important;
+}
+
+/* === 浅色选中高亮 === */
+html.theme-light table.data tr:hover td {
+  background: #eff6ff !important;
+}
+
+/* === 浅色分页按钮 === */
+/* 注意：不覆盖 .text-white，因为侧边栏等深色背景上仍需白色文字 */
+
+/* === 浅色侧边栏背景（覆盖 bg-primary）=== */
+html.theme-light .bg-primary {
+  background: linear-gradient(180deg, #ffffff, #f8fafc) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border-right: 1px solid #e2e8f0 !important;
+}
+
+/* === 浅色顶栏背景（覆盖 bg-gradient from-primary to-blue-800）=== */
+html.theme-light .bg-gradient-to-r.from-primary {
+  background: linear-gradient(to right, #ffffff, #f8fafc) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* === 浅色侧边栏文字 === */
+html.theme-light .bg-primary .text-white {
+  color: #1e293b !important;
+}
+html.theme-light .bg-primary .text-white\/80 {
+  color: #475569 !important;
+}
+
+/* === 浅色侧边栏导航链接 === */
+html.theme-light .bg-primary .sidebar-link {
+  color: #64748b !important;
+}
+html.theme-light .bg-primary .sidebar-link:hover {
+  background: rgba(37, 99, 235, 0.06) !important;
+  color: #1e293b !important;
+}
+html.theme-light .bg-primary .sidebar-link.active {
+  background: linear-gradient(135deg, #2563eb, #3b82f6) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25) !important;
+}
+
+/* === 浅色侧边栏分组标题 === */
+html.theme-light .bg-primary .text-slate-300,
+html.theme-light .bg-primary .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+/* === 浅色侧边栏底部用户信息 === */
+html.theme-light .bg-primary .border-white\/10 {
+  border-color: #e2e8f0 !important;
+}
+
+/* === 浅色顶栏标题文字 === */
+html.theme-light .bg-gradient-to-r.from-primary .text-white {
+  color: #1e293b !important;
+}
+html.theme-light .bg-gradient-to-r.from-primary .text-white\/80 {
+  color: #64748b !important;
+}
+
+/* === 浅色顶栏修复 === */
+html.theme-light header.bg-primary,
+html.theme-light header.sticky,
+html.theme-light header.shadow {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+}
+
+html.theme-light header .text-white,
+html.theme-light header .font-semibold {
+  color: #1e293b !important;
+}
+
+html.theme-light header .text-slate-300 {
+  color: #64748b !important;
+}
+
+html.theme-light header .bg-white\/10,
+html.theme-light header .bg-white\/15 {
+  background: rgba(0, 0, 0, 0.05) !important;
+  color: #475569 !important;
+}
+
+html.theme-light header button.btn-sm {
+  background: rgba(0, 0, 0, 0.05) !important;
+  color: #475569 !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+html.theme-light header button.btn-sm:hover {
+  background: rgba(0, 0, 0, 0.08) !important;
+}
+
+html.theme-light header .text-amber-300 {
+  color: #d97706 !important;
+}

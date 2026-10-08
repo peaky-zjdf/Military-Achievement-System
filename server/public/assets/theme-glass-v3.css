@@ -1,0 +1,373 @@
+/* ========================================
+ * 率土之滨军功系统 - 深色玻璃拟态主题 v3
+ * 基于 UI/UX Pro Max 设计系统
+ * 风格: Glassmorphism + Dark Mode (OLED)
+ * 配色: Financial Dashboard (#0F172A)
+ * 产品: Gaming + Data-Dense Dashboard
+ * ======================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg-base: #0a0e1a;
+  --bg-primary: #0F172A;
+  --bg-secondary: #1E293B;
+  --bg-card: rgba(15, 23, 42, 0.85);
+  --bg-glass: rgba(255, 255, 255, 0.06);
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --color-success: #22C55E;
+  --color-danger: #EF4444;
+  --color-warning: #F59E0B;
+  --color-info: #3B82F6;
+  --color-accent: #00D4FF;
+  --glass-blur: 16px;
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --radius: 12px;
+}
+
+/* === 全局 === */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Microsoft YaHei', sans-serif;
+  background: var(--bg-base) !important;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* 页面滚动 - UX #16: overflow-auto for scroll */
+html, body, #root { height: auto !important; overflow: visible !important; }
+main.flex-1 { overflow-y: auto !important; min-height: calc(100vh - 3.5rem); }
+.bg-canvas { background: var(--bg-base) !important; }
+
+/* 无障碍 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+/* === 顶栏 === */
+header.sticky, header.shadow {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(14, 18, 35, 0.95)) !important;
+  backdrop-filter: blur(var(--glass-blur)) !important;
+  border-bottom: 1px solid var(--glass-border) !important;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3) !important;
+}
+header .text-white { color: var(--text-primary) !important; }
+header .text-slate-300 { color: var(--text-secondary) !important; }
+header .bg-white\/10 { background: rgba(255, 255, 255, 0.08) !important; }
+header .hover\:bg-white\/20:hover { background: rgba(255, 255, 255, 0.15) !important; }
+header button.btn-sm { 
+  background: rgba(255, 255, 255, 0.08) !important; 
+  color: var(--text-primary) !important; 
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 8px !important;
+  transition: all 200ms ease;
+}
+header button.btn-sm:hover { background: rgba(255, 255, 255, 0.15) !important; }
+
+/* === 侧边栏 === */
+aside.bg-primary, .bg-primary {
+  background: linear-gradient(180deg, var(--bg-primary) 0%, rgba(10, 14, 26, 0.99) 100%) !important;
+  border-right: 1px solid var(--glass-border) !important;
+}
+.sidebar-link {
+  color: var(--text-secondary) !important;
+  border-radius: 8px !important;
+  padding: 10px 14px !important;
+  font-size: 0.875rem !important;
+  transition: all 200ms ease !important;
+  margin-bottom: 2px;
+}
+.sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: var(--text-primary) !important;
+}
+.sidebar-link.active {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.12), rgba(34, 197, 94, 0.08)) !important;
+  color: var(--color-accent) !important;
+  border-left: 3px solid var(--color-accent) !important;
+  font-weight: 500;
+}
+aside .border-white\/10 { border-color: var(--glass-border) !important; }
+aside .text-slate-400 { color: var(--text-muted) !important; }
+
+/* === 卡片 === */
+.card {
+  background: var(--bg-card) !important;
+  backdrop-filter: blur(var(--glass-blur)) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2) !important;
+  transition: all 200ms ease !important;
+}
+.card:hover {
+  border-color: rgba(255, 255, 255, 0.16) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* === 指标卡 === */
+.metric {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95)) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--radius) !important;
+  position: relative;
+  overflow: hidden;
+  transition: all 200ms ease;
+}
+.metric::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-accent), var(--color-success));
+  opacity: 0;
+  transition: opacity 200ms;
+}
+.metric:hover::before { opacity: 1; }
+.metric:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0, 212, 255, 0.12); }
+.metric .value {
+  color: var(--text-primary) !important;
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  font-variant-numeric: tabular-nums;
+}
+.metric .label { color: var(--text-muted) !important; }
+
+/* === 表格 === */
+.table-wrap {
+  overflow-x: auto !important;
+  border-radius: var(--radius) !important;
+  border: 1px solid var(--glass-border) !important;
+  background: var(--bg-card) !important;
+}
+table.data { font-size: 0.875rem !important; }
+table.data th {
+  background: rgba(30, 41, 59, 0.9) !important;
+  color: var(--text-secondary) !important;
+  font-weight: 600 !important;
+  font-size: 0.75rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  padding: 10px 14px !important;
+  border-bottom: 1px solid var(--glass-border) !important;
+  white-space: nowrap;
+}
+table.data td {
+  padding: 10px 14px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+  color: var(--text-primary) !important;
+  white-space: nowrap;
+  transition: background 150ms;
+}
+table.data tr:hover td { background: rgba(255, 255, 255, 0.04) !important; }
+table.data tr:last-child td { border-bottom: none !important; }
+
+/* === 按钮 === */
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-accent), #0088CC) !important;
+  color: #000 !important;
+  font-weight: 600 !important;
+  border: none !important;
+  border-radius: 10px !important;
+  padding: 10px 20px !important;
+  cursor: pointer;
+  transition: all 200ms ease !important;
+  box-shadow: 0 2px 12px rgba(0, 212, 255, 0.2);
+}
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.35) !important;
+}
+.btn-primary:active { transform: translateY(0); }
+
+.btn-secondary {
+  background: var(--bg-glass) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 10px !important;
+  padding: 10px 20px !important;
+  cursor: pointer;
+  transition: all 200ms ease !important;
+}
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.btn-success { background: var(--color-success) !important; color: #000 !important; font-weight: 600 !important; border-radius: 10px !important; }
+.btn-danger { background: var(--color-danger) !important; color: #fff !important; font-weight: 600 !important; border-radius: 10px !important; }
+.btn-warn { background: var(--color-warning) !important; color: #000 !important; font-weight: 600 !important; border-radius: 10px !important; }
+.btn-ghost { color: var(--text-secondary) !important; border-radius: 10px !important; transition: all 200ms ease !important; }
+.btn-ghost:hover { background: rgba(255, 255, 255, 0.06) !important; color: var(--text-primary) !important; }
+.btn-sm { padding: 6px 12px !important; font-size: 0.75rem !important; border-radius: 8px !important; }
+
+/* === 输入框 === */
+.input, .select, .textarea {
+  background: rgba(15, 23, 42, 0.6) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 10px !important;
+  color: var(--text-primary) !important;
+  padding: 10px 14px !important;
+  transition: all 200ms ease !important;
+  width: 100%;
+}
+.input:focus, .select:focus, .textarea:focus {
+  border-color: var(--color-accent) !important;
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.12) !important;
+  outline: none !important;
+}
+.input::placeholder { color: var(--text-muted) !important; }
+
+/* === 标签 === */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.tag-green { background: rgba(34, 197, 94, 0.12) !important; color: var(--color-success) !important; border: 1px solid rgba(34, 197, 94, 0.25); }
+.tag-red { background: rgba(239, 68, 68, 0.12) !important; color: var(--color-danger) !important; border: 1px solid rgba(239, 68, 68, 0.25); }
+.tag-blue { background: rgba(59, 130, 246, 0.12) !important; color: var(--color-info) !important; border: 1px solid rgba(59, 130, 246, 0.25); }
+.tag-orange { background: rgba(245, 158, 11, 0.12) !important; color: var(--color-warning) !important; border: 1px solid rgba(245, 158, 11, 0.25); }
+.tag-purple { background: rgba(168, 85, 247, 0.12) !important; color: #A855F7 !important; border: 1px solid rgba(168, 85, 247, 0.25); }
+.tag-gray { background: rgba(100, 116, 139, 0.12) !important; color: var(--text-muted) !important; border: 1px solid rgba(100, 116, 139, 0.25); }
+
+/* === 文字 === */
+.text-ink { color: var(--text-primary) !important; }
+.text-body { color: var(--text-secondary) !important; }
+.text-muted { color: var(--text-muted) !important; }
+.text-primary { color: var(--color-accent) !important; }
+.text-accent { color: var(--color-accent) !important; }
+.text-success { color: var(--color-success) !important; }
+.text-danger { color: var(--color-danger) !important; }
+.text-warn { color: var(--color-warning) !important; }
+.label { color: var(--text-secondary) !important; font-weight: 500; }
+
+/* === 边框 === */
+.border-slate-100, .border-slate-200 { border-color: var(--glass-border) !important; }
+.border-white\/10 { border-color: var(--glass-border) !important; }
+.border-accent\/30 { border-color: rgba(0, 212, 255, 0.2) !important; }
+
+/* === 背景色覆盖 === */
+.bg-white, .bg-slate-50, .bg-slate-100 { background: var(--bg-card) !important; }
+.bg-blue-50, .bg-blue-50\/40, .bg-blue-50\/50 { background: rgba(59, 130, 246, 0.08) !important; }
+.bg-emerald-50 { background: rgba(34, 197, 94, 0.08) !important; }
+.bg-red-50, .bg-red-50\/40 { background: rgba(239, 68, 68, 0.08) !important; }
+.bg-orange-50 { background: rgba(245, 158, 11, 0.08) !important; }
+.bg-accent\/5 { background: rgba(0, 212, 255, 0.05) !important; }
+
+/* === 模态框 === */
+.modal-mask { background-color: rgba(0, 0, 0, 0.7) !important; backdrop-filter: blur(8px); }
+.modal {
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* === 滚动条 === */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+
+/* === 响应式 === */
+@media (max-width: 768px) {
+  .card { border-radius: 10px !important; }
+  table.data th, table.data td { padding: 8px 10px !important; font-size: 0.8125rem !important; }
+}
+
+/* === 登录页背景 === */
+div[class*="min-h-screen"][class*="bg-primary"] {
+  background: linear-gradient(rgba(10,14,26,0.4), rgba(10,14,26,0.6)), url('/assets/login-bg.png') center/cover no-repeat !important;
+  backdrop-filter: none !important;
+}
+
+/* === 图表容器 === */
+.chart-box { background: var(--bg-card); border-radius: var(--radius); padding: 16px; }
+
+/* === 数字 === */
+.tabular-nums { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+
+/* === 组件级布局修复 === */
+
+/* 标签页导航 - 深色适配 */
+.flex.gap-1.p-1.bg-slate-100 {
+  background: rgba(30, 41, 59, 0.8) !important;
+  border: 1px solid var(--glass-border, rgba(255,255,255,0.1)) !important;
+  border-radius: 10px !important;
+}
+.flex.gap-1.p-1.bg-slate-100 button {
+  color: var(--text-secondary, #94A3B8) !important;
+  border-radius: 8px !important;
+  transition: all 200ms ease !important;
+}
+.flex.gap-1.p-1.bg-slate-100 button:hover {
+  color: var(--text-primary, #F8FAFC) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+/* 选中态 - 通过 shadow-sm 判断 */
+.flex.gap-1.p-1.bg-slate-100 button.shadow-sm,
+.flex.gap-1.p-1.bg-slate-100 button[class*="bg-white"] {
+  background: rgba(0, 212, 255, 0.15) !important;
+  color: var(--color-accent, #00D4FF) !important;
+  font-weight: 500 !important;
+  box-shadow: 0 0 12px rgba(0, 212, 255, 0.1) !important;
+}
+
+/* 模态框标题/底栏 - 深色适配 */
+.modal .border-b.border-slate-100,
+.modal .sticky.top-0 {
+  background: var(--bg-secondary, #1E293B) !important;
+  border-color: var(--glass-border, rgba(255,255,255,0.1)) !important;
+}
+.modal .border-b.border-slate-100 .text-ink { color: var(--text-primary, #F8FAFC) !important; }
+.modal .border-b.border-slate-100 .text-muted { color: var(--text-muted, #64748B) !important; }
+.modal .border-t.border-slate-100,
+.modal .sticky.bottom-0 {
+  background: var(--bg-secondary, #1E293B) !important;
+  border-color: var(--glass-border, rgba(255,255,255,0.1)) !important;
+}
+
+/* 进度条 - 深色适配 */
+.bg-slate-100.rounded.overflow-hidden,
+.bg-slate-100.rounded {
+  background: rgba(30, 41, 59, 0.6) !important;
+}
+
+/* 内嵌亮色区域统一 */
+.bg-slate-50 {
+  background: rgba(30, 41, 59, 0.4) !important;
+}
+.bg-slate-50.border.border-slate-100 {
+  background: rgba(30, 41, 59, 0.4) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+.border-dashed.border-slate-200 {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* 间距统一 - 减少视觉碎片 */
+.card + .card { margin-top: 12px; }
+.space-y-3 > * + * { margin-top: 10px; }
+.space-y-4 > * + * { margin-top: 14px; }
+
+/* 图表容器统一样式 */
+.chart-box {
+  background: rgba(15, 23, 42, 0.4) !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+/* 待办风险条目 - 玻璃感 */
+.bg-orange-50, .bg-red-50, .bg-blue-50, .bg-emerald-50 {
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+}

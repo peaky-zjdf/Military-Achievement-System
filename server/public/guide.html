@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0a0e1a">
+  <title>率土之滨 | 新手引导</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0a0e1a; color: #F8FAFC;
+      overflow: hidden; height: 100vh; width: 100vw;
+    }
+
+    /* === 多层渐变背景 === */
+    .guide-bg {
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse at 10% 20%, rgba(0,100,200,0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 90% 10%, rgba(0,212,255,0.1) 0%, transparent 45%),
+        radial-gradient(ellipse at 50% 80%, rgba(100,0,200,0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(0,180,120,0.08) 0%, transparent 40%),
+        linear-gradient(160deg, #0a0e1a 0%, #0d1117 50%, #0a0a1a 100%);
+    }
+    #particle-canvas { position:fixed;inset:0;z-index:1;pointer-events:none; }
+
+    /* === 主容器 === */
+    .guide-container {
+      position:relative;z-index:2;width:100%;height:100vh;
+      display:flex;flex-direction:column;overflow:hidden;
+    }
+
+    /* === 顶部品牌 === */
+    .guide-header {
+      text-align:center;padding:18px 20px 0;
+      animation:fadeDown 0.8s ease-out;flex-shrink:0;
+    }
+    .guide-header .brand-icon {
+      font-size:1.8rem;margin-bottom:2px;
+      filter:drop-shadow(0 0 20px rgba(0,212,255,0.5));
+    }
+    .guide-header h1 {
+      font-family:'Noto Serif SC',serif;font-size:1.3rem;font-weight:700;
+      letter-spacing:0.12em;
+      background:linear-gradient(135deg,#F8FAFC 0%,#00D4FF 100%);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    }
+    .guide-header .subtitle {
+      font-size:0.65rem;color:rgba(0,212,255,0.7);letter-spacing:0.25em;margin-top:1px;
+    }
+
+    /* === 幻灯片 === */
+    .slides-wrapper { flex:1;position:relative;overflow:hidden;padding:12px 0;min-height:0; }
+    .slide {
+      position:absolute;inset:0;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:8px 20px;opacity:0;transform:translateX(60px);
+      transition:all 0.5s cubic-bezier(0.4,0,0.2,1);pointer-events:none;
+      overflow-y:auto;
+    }
+    .slide.active { opacity:1;transform:translateX(0);pointer-events:auto; }
+    .slide.exit-left { opacity:0;transform:translateX(-60px); }
+
+    /* === 玻璃卡片 === */
+    .glass-card {
+      background:rgba(255,255,255,0.05);
+      backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);
+      border:1px solid rgba(255,255,255,0.1);border-radius:20px;
+      padding:22px 20px;width:100%;max-width:480px;
+      box-shadow:0 8px 32px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.08);
+      position:relative;overflow:hidden;
+    }
+    .glass-card::before {
+      content:'';position:absolute;top:0;left:0;right:0;height:1px;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);
+    }
+
+    /* === 图标 === */
+    .slide-icon {
+      width:64px;height:64px;border-radius:16px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:1.8rem;margin:0 auto 14px;position:relative;overflow:hidden;
+    }
+    .slide-icon::before {
+      content:'';position:absolute;inset:-2px;border-radius:18px;padding:2px;
+      background:linear-gradient(135deg,rgba(0,212,255,0.5),rgba(100,0,200,0.3));
+      -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+      -webkit-mask-composite:xor;mask-composite:exclude;
+    }
+
+    /* === 文字 === */
+    .slide-tag {
+      font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;
+      color:rgba(0,212,255,0.6);text-align:center;margin-bottom:6px;font-weight:600;
+    }
+    .slide-title {
+      font-family:'Noto Serif SC',serif;font-size:1.2rem;font-weight:700;
+      text-align:center;margin-bottom:6px;letter-spacing:0.05em;
+    }
+    .slide-desc {
+      font-size:0.78rem;color:rgba(255,255,255,0.55);text-align:center;
+      line-height:1.7;margin-bottom:14px;
+    }
+
+    /* === 功能网格 === */
+    .feature-grid { display:grid;gap:8px;margin-top:8px; }
+    .feature-grid.cols-2 { grid-template-columns:1fr 1fr; }
+    .feature-grid.cols-3 { grid-template-columns:1fr 1fr 1fr; }
+    .feature-item {
+      background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);
+      border-radius:12px;padding:10px 12px;
+      display:flex;align-items:flex-start;gap:8px;
+      transition:all 0.3s ease;
+    }
+    .feature-item:hover {
+      background:rgba(0,212,255,0.08);border-color:rgba(0,212,255,0.2);transform:translateY(-1px);
+    }
+    .feature-item .fi-icon { font-size:1.1rem;flex-shrink:0;margin-top:1px; }
+    .feature-item .fi-text { font-size:0.72rem;color:rgba(255,255,255,0.65);line-height:1.45; }
+    .feature-item .fi-text b { display:block;color:#F8FAFC;font-size:0.78rem;margin-bottom:1px; }
+
+    /* === 数据亮点条 === */
+    .highlight-bar {
+      display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:10px 0;
+    }
+    .h-pill {
+      background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.15);
+      border-radius:20px;padding:5px 12px;font-size:0.7rem;color:#00D4FF;
+      display:flex;align-items:center;gap:4px;white-space:nowrap;
+    }
+    .h-pill.gold { background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.15);color:#F59E0B; }
+    .h-pill.green { background:rgba(34,197,94,0.08);border-color:rgba(34,197,94,0.15);color:#22C55E; }
+    .h-pill.purple { background:rgba(168,85,247,0.08);border-color:rgba(168,85,247,0.15);color:#A855F7; }
+
+    /* === 流程步骤条 === */
+    .flow-steps { display:flex;align-items:center;gap:4px;margin:10px 0;justify-content:center; }
+    .flow-step {
+      background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);
+      border-radius:10px;padding:6px 10px;font-size:0.65rem;color:rgba(255,255,255,0.7);
+      text-align:center;position:relative;
+    }
+    .flow-step .fs-icon { font-size:1rem;display:block;margin-bottom:2px; }
+    .flow-arrow { color:rgba(0,212,255,0.4);font-size:0.8rem; }
+
+    /* === 示例卡片 === */
+    .example-box {
+      background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.06);
+      border-radius:12px;padding:12px 14px;margin-top:10px;
+    }
+    .example-box .ex-title {
+      font-size:0.65rem;color:rgba(0,212,255,0.7);letter-spacing:0.1em;
+      margin-bottom:8px;font-weight:600;
+    }
+    .example-box .ex-row {
+      display:flex;justify-content:space-between;align-items:center;
+      padding:4px 0;font-size:0.72rem;
+      border-bottom:1px solid rgba(255,255,255,0.03);
+    }
+    .example-box .ex-row:last-child { border-bottom:none; }
+    .example-box .ex-label { color:rgba(255,255,255,0.5); }
+    .example-box .ex-val { color:#F8FAFC;font-weight:500; }
+    .example-box .ex-val.pos { color:#22C55E; }
+    .example-box .ex-val.neg { color:#EF4444; }
+    .example-box .ex-val.accent { color:#00D4FF; }
+
+    /* === 欢迎页 === */
+    .welcome-hero { text-align:center;padding:6px 0; }
+    .welcome-hero .swords {
+      font-size:3rem;
+      filter:drop-shadow(0 0 30px rgba(0,212,255,0.4));
+      animation:pulse-glow 2s ease-in-out infinite;
+    }
+    @keyframes pulse-glow {
+      0%,100% { filter:drop-shadow(0 0 20px rgba(0,212,255,0.3)); }
+      50% { filter:drop-shadow(0 0 40px rgba(0,212,255,0.6)); }
+    }
+    .welcome-hero h2 {
+      font-family:'Noto Serif SC',serif;font-size:1.6rem;font-weight:700;
+      margin:10px 0 4px;
+      background:linear-gradient(135deg,#F8FAFC,#00D4FF);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    }
+    .welcome-hero .tagline { font-size:0.82rem;color:rgba(255,255,255,0.45);line-height:1.8; }
+
+    .welcome-stats { display:flex;justify-content:center;gap:20px;margin-top:16px; }
+    .welcome-stat { text-align:center; }
+    .welcome-stat .num {
+      font-size:1.5rem;font-weight:700;
+      background:linear-gradient(135deg,#00D4FF,#22C55E);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    }
+    .welcome-stat .label { font-size:0.65rem;color:rgba(255,255,255,0.4);margin-top:1px; }
+
+    /* === 底部 === */
+    .guide-footer {
+      padding:0 24px 22px;display:flex;flex-direction:column;align-items:center;gap:12px;flex-shrink:0;
+    }
+    .dots { display:flex;gap:6px; }
+    .dot {
+      width:7px;height:7px;border-radius:50%;
+      background:rgba(255,255,255,0.15);transition:all 0.4s ease;cursor:pointer;
+    }
+    .dot.active {
+      width:24px;border-radius:3px;
+      background:linear-gradient(90deg,#00D4FF,#0088CC);
+      box-shadow:0 0 10px rgba(0,212,255,0.4);
+    }
+    .btn-row { display:flex;gap:10px;width:100%;max-width:480px; }
+    .btn {
+      flex:1;padding:12px 18px;border-radius:12px;font-size:0.85rem;font-weight:600;
+      cursor:pointer;transition:all 0.3s ease;border:none;font-family:inherit;
+    }
+    .btn-ghost {
+      background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.7);
+      border:1px solid rgba(255,255,255,0.1);
+    }
+    .btn-ghost:hover { background:rgba(255,255,255,0.1);color:#F8FAFC; }
+    .btn-primary {
+      background:linear-gradient(135deg,#00D4FF,#0088CC);color:#000;font-weight:700;
+      box-shadow:0 4px 20px rgba(0,212,255,0.3);
+    }
+    .btn-primary:hover { box-shadow:0 6px 28px rgba(0,212,255,0.5);transform:translateY(-1px); }
+    .btn-start {
+      background:linear-gradient(135deg,#F59E0B,#D97706);color:#000;font-weight:700;
+      box-shadow:0 4px 20px rgba(245,158,11,0.3);font-size:0.95rem;padding:14px 18px;
+    }
+    .btn-start:hover { box-shadow:0 6px 28px rgba(245,158,11,0.5);transform:translateY(-1px); }
+    .skip-link {
+      font-size:0.7rem;color:rgba(255,255,255,0.25);cursor:pointer;
+      transition:color 0.3s;text-decoration:none;border:none;background:none;font-family:inherit;
+    }
+    .skip-link:hover { color:rgba(0,212,255,0.8); }
+    .swipe-hint {
+      position:absolute;bottom:6px;left:50%;transform:translateX(-50%);
+      font-size:0.6rem;color:rgba(255,255,255,0.18);
+      display:flex;align-items:center;gap:4px;
+      animation:bounce-hint 2s ease-in-out infinite;
+    }
+    @keyframes bounce-hint {
+      0%,100% { transform:translateX(-50%); }
+      50% { transform:translateX(-46%); }
+    }
+    @keyframes fadeDown {
+      from { opacity:0;transform:translateY(-20px); }
+      to { opacity:1;transform:translateY(0); }
+    }
+
+    /* === 移动端 === */
+    @media (max-height:680px) {
+      .guide-header { padding:10px 20px 0; }
+      .guide-header h1 { font-size:1.1rem; }
+      .guide-header .brand-icon { font-size:1.4rem; }
+      .slide-icon { width:52px;height:52px;font-size:1.5rem;margin-bottom:10px; }
+      .slide-title { font-size:1.05rem; }
+      .glass-card { padding:16px 14px;border-radius:16px; }
+      .feature-item { padding:8px 10px; }
+      .welcome-hero .swords { font-size:2.4rem; }
+      .welcome-hero h2 { font-size:1.3rem; }
+      .guide-footer { padding:0 24px 16px; }
+    }
+    @media (max-width:380px) {
+      .feature-grid.cols-2,.feature-grid.cols-3 { grid-template-columns:1fr; }
+      .welcome-stats { gap:14px; }
+      .flow-steps { flex-wrap:wrap; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="guide-bg"></div>
+<canvas id="particle-canvas"></canvas>
+
+<div class="guide-container">
+  <div class="guide-header">
+    <div class="brand-icon">⚔</div>
+    <h1 id="brand-title">率土之滨</h1>
+    <div class="subtitle" id="brand-subtitle">云衍 · 军功系统</div>
+  </div>
+
+  <div class="slides-wrapper">
+
+    <!-- ========== Slide 0: 欢迎 ========== -->
+    <div class="slide active" data-slide="0">
+      <div class="glass-card">
+        <div class="welcome-hero">
+          <div class="swords">⚔️</div>
+          <h2>欢迎加入军功系统</h2>
+          <div class="tagline">
+            率土之滨同盟专属管理平台<br>
+            让每一份战功都被铭记，让每一位将士都被看见
+          </div>
+        </div>
+        <div class="welcome-stats">
+          <div class="welcome-stat"><div class="num">10+</div><div class="label">功能模块</div></div>
+          <div class="welcome-stat"><div class="num">AI</div><div class="label">智能识别</div></div>
+          <div class="welcome-stat"><div class="num">实时</div><div class="label">数据同步</div></div>
+          <div class="welcome-stat"><div class="num">∞</div><div class="label">战功记录</div></div>
+        </div>
+        <div class="highlight-bar" style="margin-top:14px">
+          <span class="h-pill">🎯 成员管理</span>
+          <span class="h-pill gold">⚡ 战功统计</span>
+          <span class="h-pill green">🏰 打城考勤</span>
+          <span class="h-pill purple">🧠 AI 军师</span>
+        </div>
+      </div>
+      <div class="swipe-hint">→ 左滑了解更多</div>
+    </div>
+
+    <!-- ========== Slide 1: 仪表盘总览 ========== -->
+    <div class="slide" data-slide="1">
+      <div class="glass-card">
+        <div class="slide-icon" style="background:rgba(0,212,255,0.1)">📊</div>
+        <div class="slide-tag">DASHBOARD</div>
+        <div class="slide-title">仪表盘 · 全盟总览</div>
+        <div class="slide-desc">
+          登录后第一眼看到的作战指挥台。<br>
+          全盟军功、待办事项、AI 简报一屏掌握，盟运尽在掌控。
+        </div>
+        <div class="feature-grid cols-2">
+          <div class="feature-item">
+            <span class="fi-icon">📈</span>
+            <div class="fi-text"><b>核心数据面板</b>全盟累计军功、本周总武勋、待打城计划、待审核兑换四大指标实时呈现</div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-icon">🔔</span>
+            <div class="fi-text"><b>待办事项提醒</b>未处理的入盟申请、兑换审核、打城排班一目了然</div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-icon">📰</span>
+            <div class="fi-text"><b>AI 每日简报</b>自动生成同盟动态摘要，谁在发力谁在摸鱼一看便知</div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-icon">🏆</span>
+            <div class="fi-text"><b>全盟排名速览</b>个人军功排名、团队贡献对比，激励良性竞争</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== Slide 2: 成员管理 ========== -->
+    <div class="slide" data-slide="2">
+      <div class="glass-card">
+        <div class="slide-icon" style="background:rgba(59,130,246,0.1)">👥</div>
+        <div class="slide-tag">MEMBERS</div>
+        <div class="slide-title">成员管理 · 组织架构</div>
+        <div class="slide-desc">
+          从盟主到成员的完整层级体系。支持分团管理、角色权限、入盟审核，<br>
+          让同盟组织井然有序，每个人都有自己的位置。
+        </div>
+        <div class="feature-grid cols-2">
+          <div class="feature-item">
+            <span class="fi-icon">📋</span>
+            <div class="fi-text"><b>成员档案</b>游戏ID、昵称、QQ、邮箱、势力值、所属团、职位，一人一档</div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-icon">📥</span>
+            <div class="fi-text"><b>入盟申请审核</b>新成员在线提交申请，盟主/副盟一键审批或驳回</div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-icon">🏢</span>
+            <div class="fi-text"><b>分团管理</b>创建一团、二团…自由分配成员，任命团长独立管理</div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-icon">🎖️</span>
+            <div class="fi-text"><b>四级权限</b>盟主 → 副盟 → 团长 → 成员，不同角色看到不同菜单</div>
+          </div>
+        </div>
+        <div class="highlight-bar">
+          <span class="h-pill">🔍 搜索昵称/ID</span>
+          <span class="h-pill">📊 成员状态筛选</span>
+          <span class="h-pill">📤 数据批量导出</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== Slide 3: 打城管理 ========== -->
+    <div class="slide" data-slide="3">
+      <div class="glass-card">
+        <div class="slide-icon" style="background:rgba(34,197,94,0.1)">🏰</div>
+        <div class="slide-tag">CITY SIEGE</div>
+        <div class="slide-title">打城管理 · 攻城考勤</div>
+        <div class="slide-desc">
+          攻城是率土之滨的核心玩法。系统帮你规划每一次攻城行动，<br>
+          自动记录出勤，精确到每个人的到场与缺席。
+        </div>
+        <div class="flow-steps">
+          <div class="flow-step"><span class="fs-icon">📅</span>创建攻城计划</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step"><span class="fs-icon">📋</span>发布排班任务</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step"><span class="fs-icon">✅</span>记录出勤</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step"><span class="fs-icon">📊</span>统计报表</div>
+        </div>
+        <div class="feature-grid cols-2">
+          <div class="feature-item">
+            <span class="fi-icon">📆</span>
+            <div class="fi-text"><b>日历视图</b>以日历形式展示攻城安排，哪天打哪座城一目了然</div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-icon">📝</span>
+            <div class="fi-text"><b>考勤记录</b>出勤/缺勤/迟到分类标记，支持批量导入</div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-icon">📊</span>
+            <div class="fi-text"><b>打城统计</b>按成员、按团、按周汇总出勤率，数据说话</div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-icon">⚡</span>
+            <div class="fi-text"><b>自动计入军功</b>出勤加分、缺勤扣分，规则可自定义配置</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== Slide 4: 武勋 & 军功 ========== -->
+    <div class="slide" data-slide="4">
+      <div class="glass-card">
+        <div class="slide-icon" style="background:rgba(245,158,11,0.1)">⚡</div>
+        <div class="slide-tag">MERIT SYSTEM</div>
+        <div class="slide-title">武勋 & 军功 · 核心引擎</div>
+        <div class="slide-desc">
+          这是整个系统的灵魂。AI 智能识别战报截图，自动提取武勋数据；<br>
+          军功规则灵活可配，灭敌、拆迁、驻守、抢地……每种行为都有对应分值。
+        </div>
+        <div class="example-box">
+          <div class="ex-title">▎ 军功流水示例</div>
+          <div class="ex-row"><span class="ex-label">📤 上传战报截图（AI识别）</span><span class="ex-val pos">+120 军功</span></div>
+          <div class="ex-row"><span class="ex-label">🏰 打城出勤（周六攻城）</span><span class="ex-val pos">+50 军功</span></div>
+          <div class="ex-row"><span class="ex-label">⚠️ 打城缺席未报备</span><span class="ex-val neg">-30 军功</span></div>
+          <div class="ex-row"><span class="ex-label">🎯 手动调整（盟主奖励）</span><span class="ex-val pos">+200 军功</span></div>
+          <div class="ex-row"><span class="ex-label" style="font-weight:500;color:#F8FAFC">💰 当前可用军功</span><span class="ex-val accent">340</span></div>
+        </div>
+        <div class="feature-grid cols-2" style="margin-top:10px">
+          <div class="feature-item">
+            <span class="fi-icon">🤖</span>
+            <div class="fi-text"><b>AI 截图识别</b>上传战报/征程截图，自动提取武将、战功、灭敌数据</div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-icon">⚙️</span>
+            <div class="fi-text"><b>规则引擎</b>1武勋=？军功、1灭敌=？军功，全站系数可调</div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-icon">📜</span>
+            <div class="fi-text"><b>完整流水</b>每一笔军功收支都有记录，来源可追溯</div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-icon">✏️</span>
+            <div class="fi-text"><b>手动调整</b>盟主/副盟可手动加减军功，支持批量操作</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== Slide 5: 军功商场 ========== -->
+    <div class="slide" data-slide="5">
+      <div class="glass-card">
+        <div class="slide-icon" style="background:rgba(168,85,247,0.1)">🛒</div>
+        <div class="slide-tag">SHOP</div>
+        <div class="slide-title">军功商场 · 兑换奖励</div>
+        <div class="slide-desc">
+          战功不是白打的！用军功兑换实物奖品、虚拟权益、赛季奖励，<br>
+          让每一位奋勇杀敌的将士都能得到回报。
+        </div>
+        <div class="feature-grid cols-2">
+          <div class="feature-item">
+            <span class="fi-icon">🎁</span>
+            <div class="fi-text"><b>商品管理</b>上架实物/虚拟商品，设置价格、库存、限购数量</div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-icon">💰</span>
+            <div class="fi-text"><b>军功兑换</b>成员浏览商城，用累积军功直接兑换心仪商品</div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-icon">📦</span>
+            <div class="fi-text"><b>订单审核</b>兑换申请可设免审或需审核，虚拟道具可自动发货</div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-icon">🏅</span>
+            <div class="fi-text"><b>赛季奖励</b>赛季结算时按排名发放专属奖品，征服名额等</div>
+          </div>
+        </div>
+        <div class="example-box">
+          <div class="ex-title">▎ 商城商品示例</div>
+          <div class="ex-row"><span class="ex-label">🎮 游戏礼包码</span><span class="ex-val">500 军功</span></div>
+          <div class="ex-row"><span class="ex-label">💎 月卡充值</span><span class="ex-val">2000 军功</span></div>
+          <div class="ex-row"><span class="ex-label">🏆 S赛季征服名额</span><span class="ex-val gold">5000 军功</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== Slide 6: 战场 & 敌情 ========== -->
+    <div class="slide" data-slide="6">
+      <div class="glass-card">
+        <div class="slide-icon" style="background:rgba(239,68,68,0.1)">🔥</div>
+        <div class="slide-tag">BATTLEFIELD</div>
+        <div class="slide-title">战场管理 · 敌情侦察</div>
+        <div class="slide-desc">
+          知己知彼，百战不殆。记录每场战役的详细信息，<br>
+          建立敌对势力情报库，上传阵容截图分析敌方配置。
+        </div>
+        <div class="feature-grid cols-2">
+          <div class="feature-item">
+            <span class="fi-icon">⚔️</span>
+            <div class="fi-text"><b>战役列表</b>记录每场战役的时间、地点、参与人员、战果</div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-icon">🕵️</span>
+            <div class="fi-text"><b>敌对势力</b>建立敌方玩家档案，记录同盟、武将、常用阵容</div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-icon">📸</span>
+            <div class="fi-text"><b>阵容截图</b>上传敌方阵容/战报截图，全盟共享情报</div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-icon">🗺️</span>
+            <div class="fi-text"><b>战场态势</b>主力/中军/要塞位置标注，战局一图掌控</div>
+          </div>
+        </div>
+        <div class="highlight-bar">
+          <span class="h-pill">🔍 搜索玩家/敌方/武将</span>
+          <span class="h-pill gold">📋 战报内容检索</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== Slide 7: AI 军师 ========== -->
+    <div class="slide" data-slide="7">
+      <div class="glass-card">
+        <div class="slide-icon" style="background:rgba(168,85,247,0.1)">🧠</div>
+        <div class="slide-tag">AI STRATEGIST</div>
+        <div class="slide-title">AI 军师 · 智能分析</div>
+        <div class="slide-desc">
+          接入大语言模型，为同盟提供智能化战略分析。<br>
+          自由提问，AI 基于同盟数据给出专业建议。
+        </div>
+        <div class="example-box">
+          <div class="ex-title">▎ 你可以这样问 AI 军师</div>
+          <div class="ex-row"><span class="ex-label" style="color:rgba(255,255,255,0.7)">💬 "本周谁最值得奖励？"</span></div>
+          <div class="ex-row"><span class="ex-label" style="color:rgba(255,255,255,0.7)">💬 "敌方吕布队怎么克制？"</span></div>
+          <div class="ex-row"><span class="ex-label" style="color:rgba(255,255,255,0.7)">💬 "帮我分析下周打城策略"</span></div>
+          <div class="ex-row"><span class="ex-label" style="color:rgba(255,255,255,0.7)">💬 "哪些成员出勤率需要关注？"</span></div>
+        </div>
+        <div class="feature-grid cols-2" style="margin-top:10px">
+          <div class="feature-item">
+            <span class="fi-icon">💬</span>
+            <div class="fi-text"><b>自由问答</b>不限格式提问，AI 理解率土语境</div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-icon">📊</span>
+            <div class="fi-text"><b>数据驱动</b>基于同盟真实数据分析，非泛泛而谈</div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-icon">🔧</span>
+            <div class="fi-text"><b>模型可配</b>支持 OpenAI 兼容接口，可切换不同模型</div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-icon">📧</span>
+            <div class="fi-text"><b>邮件群发</b>配合 AI 生成内容，一键发送同盟邮件</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== Slide 8: 排行 & 赛季 ========== -->
+    <div class="slide" data-slide="8">
+      <div class="glass-card">
+        <div class="slide-icon" style="background:rgba(245,158,11,0.1)">🏆</div>
+        <div class="slide-tag">RANKING & AWARDS</div>
+        <div class="slide-title">排行榜 & 赛季奖励</div>
+        <div class="slide-desc">
+          多维度排名激发竞争意识，赛季结算给予应得的荣誉与奖赏。<br>
+          让努力被看见，让付出有回报。
+        </div>
+        <div class="feature-grid cols-2">
+          <div class="feature-item">
+            <span class="fi-icon">🏅</span>
+            <div class="fi-text"><b>军功排行</b>按累计军功排名，全盟/分团双视角</div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-icon">⚔️</span>
+            <div class="fi-text"><b>武勋排行</b>按周/月武勋排名，谁是战场MVP</div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-icon">📅</span>
+            <div class="fi-text"><b>赛季管理</b>创建赛季、记录征服名额、结算军功</div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-icon">🎖️</span>
+            <div class="fi-text"><b>赛季奖励</b>按排名发放专属奖品，可兑换实物/虚拟</div>
+          </div>
+        </div>
+        <div class="example-box">
+          <div class="ex-title">▎ 排行榜维度</div>
+          <div class="ex-row"><span class="ex-label">🥇 累计军功排名</span><span class="ex-val accent">全盟成员</span></div>
+          <div class="ex-row"><span class="ex-label">🥈 本周武勋排名</span><span class="ex-val accent">周活战士</span></div>
+          <div class="ex-row"><span class="ex-label">🥉 团队贡献对比</span><span class="ex-val accent">各团PK</span></div>
+          <div class="ex-row"><span class="ex-label">📊 势力值排名</span><span class="ex-val accent">综合实力</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== Slide 9: 系统设置 ========== -->
+    <div class="slide" data-slide="9">
+      <div class="glass-card">
+        <div class="slide-icon" style="background:rgba(99,102,241,0.1)">⚙️</div>
+        <div class="slide-tag">SETTINGS</div>
+        <div class="slide-title">系统设置 · 个性化定制</div>
+        <div class="slide-desc">
+          军功规则、AI 配置、邮箱设置、主题切换……<br>
+          一切尽在掌控，打造属于你们同盟的专属系统。
+        </div>
+        <div class="feature-grid cols-2">
+          <div class="feature-item">
+            <span class="fi-icon">📐</span>
+            <div class="fi-text"><b>军功规则</b>灭敌/拆迁/驻守/抢地换算系数，全站即时生效</div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-icon">🤖</span>
+            <div class="fi-text"><b>AI 配置</b>视觉模型+文本模型，支持 OpenAI 兼容接口</div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-icon">📧</span>
+            <div class="fi-text"><b>邮箱配置</b>IMAP/SMTP 设置，支持 QQ邮箱、163 等</div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-icon">🎨</span>
+            <div class="fi-text"><b>三主题切换</b>深色/玻璃拟态/浅色，顶栏一键切换</div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-icon">📢</span>
+            <div class="fi-text"><b>公告管理</b>系统公告、标题文案自定义，开屏同步展示</div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-icon">📤</span>
+            <div class="fi-text"><b>数据导出</b>成员、军功、考勤数据批量导出 Excel</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== Slide 10: 准备开始 ========== -->
+    <div class="slide" data-slide="10">
+      <div class="glass-card" style="text-align:center">
+        <div style="font-size:2.8rem;margin-bottom:12px;filter:drop-shadow(0 0 20px rgba(245,158,11,0.4))">🚀</div>
+        <div class="slide-tag">READY TO GO</div>
+        <div class="slide-title" style="font-size:1.4rem">将军，准备好了吗？</div>
+        <div class="slide-desc" style="margin-bottom:18px">
+          你已经了解了军功系统的所有核心功能。<br>
+          现在就踏入战场，为同盟的荣耀而战！
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:center">
+          <div class="h-pill" style="font-size:0.75rem;padding:7px 16px">
+            ⚔ 上传第一张战报截图，开启军功之旅
+          </div>
+          <div class="h-pill gold" style="font-size:0.75rem;padding:7px 16px">
+            🏆 冲击排行榜，成为同盟最强战力
+          </div>
+          <div class="h-pill green" style="font-size:0.75rem;padding:7px 16px">
+            🏰 参与攻城行动，用出勤证明你的忠诚
+          </div>
+          <div class="h-pill purple" style="font-size:0.75rem;padding:7px 16px">
+            🛒 兑换军功奖励，战功就是你的货币
+          </div>
+        </div>
+        <div style="margin-top:16px;font-size:0.72rem;color:rgba(255,255,255,0.35);line-height:1.6">
+          💡 提示：侧边栏「📖 新手引导」可随时重新查看本教程
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 底部控制 -->
+  <div class="guide-footer">
+    <div class="dots" id="dots"></div>
+    <div class="btn-row" id="btn-row">
+      <button class="btn btn-ghost" id="btn-prev" style="display:none">上一步</button>
+      <button class="btn btn-primary" id="btn-next">开始探索</button>
+    </div>
+    <button class="skip-link" id="btn-skip">跳过引导，直接进入系统 →</button>
+  </div>
+</div>
+
+<script>
+(function() {
+  // === 同步品牌信息 ===
+  fetch('/api/settings/brand').then(function(r){return r.json()}).then(function(d){
+    if(d.title){
+      var parts=d.title.split('|');
+      var t1=document.getElementById('brand-title');
+      var t2=document.getElementById('brand-subtitle');
+      if(t1&&parts[0]) t1.textContent=parts[0].trim();
+      if(t2&&parts[1]) t2.textContent=parts[1].trim();
+    }
+  }).catch(function(){});
+
+  // === 粒子系统 ===
+  var canvas=document.getElementById('particle-canvas');
+  var ctx=canvas.getContext('2d');
+  var particles=[];
+  var animId;
+  function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+  resize();
+  window.addEventListener('resize',function(){resize();initP();});
+  function initP(){
+    particles=[];
+    var count=Math.min(55,Math.floor((canvas.width*canvas.height)/20000));
+    for(var i=0;i<count;i++){
+      particles.push({
+        x:Math.random()*canvas.width,y:Math.random()*canvas.height,
+        size:Math.random()*2.5+0.5,
+        sx:(Math.random()-0.5)*0.35,sy:(Math.random()-0.5)*0.35,
+        o:Math.random()*0.25+0.08,
+        hue:Math.random()>0.6?190:Math.random()>0.3?170:45,
+        pulse:Math.random()*Math.PI*2,ps:Math.random()*0.012+0.004
+      });
+    }
+  }
+  initP();
+  function drawP(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    for(var i=0;i<particles.length;i++){
+      var p=particles[i];
+      p.x+=p.sx;p.y+=p.sy;p.pulse+=p.ps;
+      if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;
+      if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;
+      var co=p.o*(0.6+0.4*Math.sin(p.pulse));
+      var cs=p.size*(0.8+0.2*Math.sin(p.pulse));
+      ctx.beginPath();ctx.arc(p.x,p.y,cs*3,0,Math.PI*2);
+      ctx.fillStyle='hsla('+p.hue+',70%,60%,'+(co*0.1)+')';ctx.fill();
+      ctx.beginPath();ctx.arc(p.x,p.y,cs,0,Math.PI*2);
+      ctx.fillStyle='hsla('+p.hue+',80%,70%,'+co+')';ctx.fill();
+    }
+    for(var i=0;i<particles.length;i++){
+      for(var j=i+1;j<particles.length;j++){
+        var dx=particles[i].x-particles[j].x,dy=particles[i].y-particles[j].y;
+        var d=Math.sqrt(dx*dx+dy*dy);
+        if(d<90){
+          ctx.beginPath();ctx.moveTo(particles[i].x,particles[i].y);
+          ctx.lineTo(particles[j].x,particles[j].y);
+          ctx.strokeStyle='hsla(190,60%,60%,'+((1-d/90)*0.08)+')';
+          ctx.lineWidth=0.4;ctx.stroke();
+        }
+      }
+    }
+    animId=requestAnimationFrame(drawP);
+  }
+  drawP();
+
+  // === 幻灯片控制 ===
+  var current=0;
+  var total=11;
+  var slides=document.querySelectorAll('.slide');
+  var dotsEl=document.getElementById('dots');
+  var btnNext=document.getElementById('btn-next');
+  var btnPrev=document.getElementById('btn-prev');
+  var btnSkip=document.getElementById('btn-skip');
+
+  for(var i=0;i<total;i++){
+    var d=document.createElement('div');
+    d.className='dot'+(i===0?' active':'');
+    d.dataset.idx=i;
+    d.onclick=(function(idx){return function(){goTo(idx);};})(i);
+    dotsEl.appendChild(d);
+  }
+
+  function goTo(idx){
+    if(idx<0||idx>=total||idx===current)return;
+    var dir=idx>current?1:-1;
+    slides[current].classList.remove('active');
+    slides[current].style.transform=dir>0?'translateX(-60px)':'translateX(60px)';
+    slides[current].style.opacity='0';
+    current=idx;
+    for(var i=0;i<slides.length;i++){
+      if(i!==current){
+        slides[i].classList.remove('active','exit-left');
+        slides[i].style.transform=i<current?'translateX(-60px)':'translateX(60px)';
+        slides[i].style.opacity='0';
+      }
+    }
+    slides[current].style.transform=dir>0?'translateX(60px)':'translateX(-60px)';
+    slides[current].offsetHeight;
+    slides[current].classList.add('active');
+    slides[current].style.transform='';
+    slides[current].style.opacity='';
+    var dots=dotsEl.querySelectorAll('.dot');
+    for(var i=0;i<dots.length;i++) dots[i].className='dot'+(i===current?' active':'');
+    updateButtons();
+  }
+
+  function updateButtons(){
+    if(current===0){
+      btnPrev.style.display='none';
+      btnNext.textContent='开始探索';btnNext.className='btn btn-primary';
+    }else if(current===total-1){
+      btnPrev.style.display='';
+      btnNext.textContent='🚀 立即开始';btnNext.className='btn btn-start';
+    }else{
+      btnPrev.style.display='';
+      btnNext.textContent='下一步';btnNext.className='btn btn-primary';
+    }
+  }
+
+  btnNext.onclick=function(){
+    if(current<total-1) goTo(current+1);
+    else enterApp();
+  };
+  btnPrev.onclick=function(){if(current>0)goTo(current-1);};
+  btnSkip.onclick=function(){enterApp();};
+
+  function enterApp(){
+    localStorage.setItem('shitabing_guide_done','1');
+    localStorage.setItem('shitabing_guide_time',Date.now().toString());
+    var gc=document.querySelector('.guide-container');
+    gc.style.transition='opacity 0.5s, transform 0.5s';
+    gc.style.opacity='0';gc.style.transform='scale(0.95)';
+    setTimeout(function(){window.location.href='/';},500);
+  }
+
+  // === 触摸滑动 ===
+  var touchStartX=0;
+  var wrapper=document.querySelector('.slides-wrapper');
+  wrapper.addEventListener('touchstart',function(e){touchStartX=e.changedTouches[0].screenX;},{passive:true});
+  wrapper.addEventListener('touchend',function(e){
+    var diff=touchStartX-e.changedTouches[0].screenX;
+    if(Math.abs(diff)>50){
+      if(diff>0&&current<total-1)goTo(current+1);
+      else if(diff<0&&current>0)goTo(current-1);
+    }
+  },{passive:true});
+
+  // 键盘
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();btnNext.click();}
+    else if(e.key==='ArrowLeft'){e.preventDefault();btnPrev.click();}
+    else if(e.key==='Escape')enterApp();
+  });
+
+  // 初始化位置
+  for(var i=1;i<slides.length;i++){
+    slides[i].style.transform='translateX(60px)';slides[i].style.opacity='0';
+  }
+  updateButtons();
+})();
+</script>
+
+</body>
+</html>

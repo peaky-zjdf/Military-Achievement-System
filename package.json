@@ -1,0 +1,27 @@
+{
+  "name": "shitabing-merit",
+  "version": "1.0.0",
+  "private": true,
+  "description": "率土之滨同盟军功管理系统",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server/index.js",
+    "seed": "node server/seed.js",
+    "clear-data": "node server/clear-data.js",
+    "gen-license": "node tools/gen-license.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.7.0",
+    "compression": "^1.8.2",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.3.0",
+    "nodemailer": "^10.0.9",
+    "tesseract.js": "^7.0.0",
+    "xlsx": "^0.18.5"
+  }
+}

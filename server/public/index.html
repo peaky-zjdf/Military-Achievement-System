@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#0a0e1a" />
+    <meta name="description" content="率土之滨同盟军功管理系统 - 成员管理、战功统计、打城考勤、军功商城" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>率土之滨 | 云衍 · 军功系统</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔</text></svg>" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <style>
+      #splash {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        z-index: 9999; display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        background: #0a0e1a; overflow: hidden;
+      }
+      #splash .splash-bg {
+        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        background: url('/assets/splash.jpg') center center / cover no-repeat;
+        opacity: 0; transform: scale(1.1);
+        animation: splashBgIn 2s ease-out 0.3s forwards;
+      }
+      #splash .splash-overlay {
+        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(180deg, rgba(10,14,26,0.3) 0%, rgba(10,14,26,0.1) 40%, rgba(10,14,26,0.5) 70%, rgba(10,14,26,0.95) 100%);
+      }
+      #splash .splash-content {
+        position: relative; z-index: 2; text-align: center;
+        animation: splashContentIn 1s ease-out 0.8s both;
+      }
+      #splash .splash-title {
+        font-size: 3rem; font-weight: 700; color: #fff;
+        letter-spacing: 0.15em;
+        text-shadow: 0 0 40px rgba(0,212,255,0.5), 0 2px 8px rgba(0,0,0,0.5);
+        margin-bottom: 0.3rem;
+        font-family: 'Noto Serif SC','STSong','SimSun', serif;
+      }
+      #splash .splash-subtitle {
+        font-size: 1.2rem; color: rgba(0,212,255,0.8);
+        letter-spacing: 0.3em; text-transform: uppercase;
+        margin-bottom: 2rem;
+        text-shadow: 0 0 15px rgba(0,212,255,0.4);
+      }
+      #splash .splash-bar-wrap {
+        width: 200px; height: 2px;
+        background: rgba(255,255,255,0.06);
+        border-radius: 1px; margin: 0 auto 1rem; overflow: hidden;
+      }
+      #splash .splash-bar {
+        height: 100%; width: 0%;
+        background: linear-gradient(90deg, #0066ff, #00d4ff);
+        border-radius: 1px;
+        box-shadow: 0 0 10px rgba(0,212,255,0.6);
+        animation: splashBar 2.5s ease-in-out 0.5s forwards;
+      }
+      #splash .splash-loading {
+        font-size: 0.7rem; color: rgba(148,163,184,0.6); letter-spacing: 0.1em;
+      }
+      #splash .particle {
+        position: absolute; width: 2px; height: 2px;
+        background: rgba(0,212,255,0.6); border-radius: 50%;
+        animation: particleFloat 3s ease-in-out infinite;
+      }
+      @keyframes splashBgIn { to { opacity: 1; transform: scale(1); } }
+      @keyframes splashContentIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes splashBar { 0%{width:0%} 30%{width:40%} 60%{width:70%} 80%{width:85%} 100%{width:100%} }
+      @keyframes particleFloat { 0%,100%{transform:translateY(0) translateX(0);opacity:0} 10%{opacity:0.8} 50%{transform:translateY(-80px) translateX(20px);opacity:0.4} 90%{opacity:0} }
+      #splash.splash-hide { animation: splashOut 0.8s ease-in forwards; pointer-events: none !important; }
+      @keyframes splashOut { 0%{opacity:1} 100%{opacity:0} }
+      body { margin: 0; background: #0a0e1a; }
+    </style>
+    <script type="module" crossorigin src="/assets/index-glass2-v3.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/css-glass1.css">
+    <link rel="stylesheet" href="/assets/theme-glass-v3.css" id="theme-dark-css">
+    <link rel="stylesheet" href="/assets/theme-glass-frost.css" id="theme-frost-css" disabled>
+    <link rel="stylesheet" href="/assets/theme-light.css" id="theme-light-css" disabled>
+  </head>
+  <body>
+    <div id="splash">
+      <div class="splash-bg"></div>
+      <div class="splash-overlay"></div>
+      <div class="particle" style="left:10%;top:60%;animation-delay:0s"></div>
+      <div class="particle" style="left:25%;top:70%;animation-delay:0.5s"></div>
+      <div class="particle" style="left:40%;top:55%;animation-delay:1s"></div>
+      <div class="particle" style="left:60%;top:65%;animation-delay:1.5s"></div>
+      <div class="particle" style="left:75%;top:50%;animation-delay:0.8s"></div>
+      <div class="particle" style="left:85%;top:75%;animation-delay:2s"></div>
+      <div class="particle" style="left:15%;top:45%;animation-delay:1.2s"></div>
+      <div class="particle" style="left:50%;top:80%;animation-delay:0.3s"></div>
+      <div class="particle" style="left:70%;top:40%;animation-delay:1.8s"></div>
+      <div class="particle" style="left:90%;top:55%;animation-delay:0.6s"></div>
+      <div class="splash-content">
+        <div class="splash-title" id="splash-title">率土之滨</div>
+        <div class="splash-subtitle" id="splash-subtitle">云衍 · 军功系统</div>
+        <div class="splash-bar-wrap"><div class="splash-bar"></div></div>
+        <div class="splash-loading">系统加载中...</div>
+      </div>
+    </div>
+
+    <div id="root"></div>
+
+    <!-- 开屏标题同步系统设置 -->
+    <script>
+    (function() {
+      fetch('/api/settings/brand').then(function(r) { return r.json(); }).then(function(d) {
+        if (d.title) {
+          var parts = d.title.split('|');
+          var title = (parts[0] || '').trim();
+          var subtitle = (parts[1] || '').trim();
+          var el1 = document.getElementById('splash-title');
+          var el2 = document.getElementById('splash-subtitle');
+          if (el1 && title) el1.textContent = title;
+          if (el2 && subtitle) el2.textContent = subtitle;
+          document.title = d.title;
+        }
+      }).catch(function() {});
+    })();
+    </script>
+
+    <!-- 粒子特效画布（玻璃拟态主题专用） -->
+    <canvas id="frost-particles" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;display:none"></canvas>
+
+    <noscript>
+      <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:sans-serif;color:#94a3b8;text-align:center;padding:2rem;background:#0a0e1a">
+        <div><h1 style="font-size:1.5rem;color:#00d4ff;margin-bottom:0.5rem">率土之滨 · 军功系统</h1><p>本系统需要 JavaScript 支持，请启用 JavaScript 后刷新页面。</p></div>
+      </div>
+    </noscript>
+
+    <script>
+      // 主题切换（插入到顶栏退出按钮后面）- 支持3个主题
+      (function() {
+        var themes = ['dark', 'frost', 'light'];
+        var icons = { dark: '🌙', frost: '❄️', light: '☀️' };
+        var darkCss = document.getElementById('theme-dark-css');
+        var frostCss = document.getElementById('theme-frost-css');
+        var lightCss = document.getElementById('theme-light-css');
+        var html = document.documentElement;
+
+        function applyTheme(btn, theme) {
+          var icon = btn.querySelector('span');
+          // 禁用所有主题
+          darkCss.disabled = true;
+          frostCss.disabled = true;
+          lightCss.disabled = true;
+          html.classList.remove('theme-light');
+          
+          // 启用选中的主题
+          if (theme === 'dark') {
+            darkCss.disabled = false;
+          } else if (theme === 'frost') {
+            darkCss.disabled = false;
+            frostCss.disabled = false;
+          } else if (theme === 'light') {
+            lightCss.disabled = false;
+            html.classList.add('theme-light');
+          }
+          
+          icon.textContent = icons[theme] || '🌙';
+          btn.style.background = 'rgba(255,255,255,0.1)';
+          btn.style.color = '#fff';
+          btn.title = '主题: ' + (theme === 'dark' ? '深色' : theme === 'frost' ? '玻璃拟态' : '浅色');
+          
+          // 粒子特效
+          if (window._frostParticles) {
+            if (theme === 'frost') window._frostParticles.start();
+            else window._frostParticles.stop();
+          }
+        }
+
+        function insertToggle() {
+          var existing = document.getElementById('theme-toggle');
+          if (existing && existing.parentNode.tagName !== 'DIV') return;
+          var exitBtn = document.querySelector('header button');
+          if (!exitBtn) return;
+          var container = exitBtn.closest('.ml-auto') || exitBtn.closest('.flex.items-center');
+          if (!container) return;
+          var btns = container.querySelectorAll('button');
+          var logoutBtn = null;
+          btns.forEach(function(b) { if (b.textContent.trim() === '退出') logoutBtn = b; });
+          if (!logoutBtn) return;
+          if (document.getElementById('theme-toggle-in-header')) return;
+          var btn = document.createElement('div');
+          btn.id = 'theme-toggle-in-header';
+          btn.style.cssText = 'width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;line-height:1;transition:all 0.25s;border:1px solid rgba(255,255,255,0.15)';
+          btn.innerHTML = '<span></span>';
+          logoutBtn.parentNode.insertBefore(btn, logoutBtn.nextSibling);
+          var current = localStorage.getItem('shitabing_theme') || 'dark';
+          applyTheme(btn, current);
+          btn.addEventListener('click', function() {
+            var idx = themes.indexOf(localStorage.getItem('shitabing_theme') || 'dark');
+            var next = themes[(idx + 1) % themes.length];
+            localStorage.setItem('shitabing_theme', next);
+            applyTheme(btn, next);
+          });
+          var old = document.getElementById('theme-toggle');
+          if (old) old.remove();
+        }
+
+        var observer = new MutationObserver(function() { insertToggle(); });
+        observer.observe(document.getElementById('root'), { childList: true, subtree: true });
+        setInterval(insertToggle, 500);
+
+        // === 粒子特效系统 ===
+        var canvas = document.getElementById('frost-particles');
+        var ctx = canvas.getContext('2d');
+        var particles = [];
+        var animId = null;
+
+        function resizeCanvas() {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+        }
+
+        function createParticle() {
+          return {
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: Math.random() * 3 + 1,
+            speedX: (Math.random() - 0.5) * 0.5,
+            speedY: (Math.random() - 0.5) * 0.5,
+            opacity: Math.random() * 0.4 + 0.1,
+            hue: Math.random() > 0.5 ? 190 : 170, // 青色/蓝绿色
+            pulse: Math.random() * Math.PI * 2,
+            pulseSpeed: Math.random() * 0.02 + 0.005
+          };
+        }
+
+        function initParticles() {
+          particles = [];
+          var count = Math.floor((canvas.width * canvas.height) / 15000);
+          count = Math.min(count, 80);
+          for (var i = 0; i < count; i++) {
+            particles.push(createParticle());
+          }
+        }
+
+        function drawParticles() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          for (var i = 0; i < particles.length; i++) {
+            var p = particles[i];
+            p.x += p.speedX;
+            p.y += p.speedY;
+            p.pulse += p.pulseSpeed;
+
+            // 边界循环
+            if (p.x < 0) p.x = canvas.width;
+            if (p.x > canvas.width) p.x = 0;
+            if (p.y < 0) p.y = canvas.height;
+            if (p.y > canvas.height) p.y = 0;
+
+            var currentOpacity = p.opacity * (0.6 + 0.4 * Math.sin(p.pulse));
+            var currentSize = p.size * (0.8 + 0.2 * Math.sin(p.pulse));
+
+            // 外发光
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, currentSize * 3, 0, Math.PI * 2);
+            ctx.fillStyle = 'hsla(' + p.hue + ', 70%, 60%, ' + (currentOpacity * 0.15) + ')';
+            ctx.fill();
+
+            // 核心粒子
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, currentSize, 0, Math.PI * 2);
+            ctx.fillStyle = 'hsla(' + p.hue + ', 80%, 70%, ' + currentOpacity + ')';
+            ctx.fill();
+
+            // 高光点
+            ctx.beginPath();
+            ctx.arc(p.x - currentSize * 0.3, p.y - currentSize * 0.3, currentSize * 0.3, 0, Math.PI * 2);
+            ctx.fillStyle = 'hsla(' + p.hue + ', 60%, 90%, ' + (currentOpacity * 0.6) + ')';
+            ctx.fill();
+          }
+
+          // 连线效果（距离较近的粒子）
+          for (var i = 0; i < particles.length; i++) {
+            for (var j = i + 1; j < particles.length; j++) {
+              var dx = particles[i].x - particles[j].x;
+              var dy = particles[i].y - particles[j].y;
+              var dist = Math.sqrt(dx * dx + dy * dy);
+              if (dist < 120) {
+                var lineOpacity = (1 - dist / 120) * 0.15;
+                ctx.beginPath();
+                ctx.moveTo(particles[i].x, particles[i].y);
+                ctx.lineTo(particles[j].x, particles[j].y);
+                ctx.strokeStyle = 'hsla(190, 60%, 60%, ' + lineOpacity + ')';
+                ctx.lineWidth = 0.5;
+                ctx.stroke();
+              }
+            }
+          }
+
+          animId = requestAnimationFrame(drawParticles);
+        }
+
+        function startParticles() {
+          canvas.style.display = 'block';
+          resizeCanvas();
+          initParticles();
+          if (!animId) drawParticles();
+        }
+
+        function stopParticles() {
+          canvas.style.display = 'none';
+          if (animId) {
+            cancelAnimationFrame(animId);
+            animId = null;
+          }
+        }
+
+        // 暴露给主题切换使用
+        window._frostParticles = { start: startParticles, stop: stopParticles };
+
+        window.addEventListener('resize', function() {
+          if (canvas.style.display !== 'none') {
+            resizeCanvas();
+            initParticles();
+          }
+        });
+
+        // 如果当前是 frost 主题，启动粒子
+        if (localStorage.getItem('shitabing_theme') === 'frost') {
+          setTimeout(startParticles, 100);
+        }
+      })();
+    </script>
+
+    <script>
+      // 开屏动画控制
+      (function() {
+        var splash = document.getElementById('splash');
+        var MIN_SHOW = 3000;
+        var startTime = Date.now();
+        function hideSplash() {
+          var elapsed = Date.now() - startTime;
+          var remaining = Math.max(0, MIN_SHOW - elapsed);
+          setTimeout(function() {
+            splash.style.pointerEvents = 'none';
+            splash.classList.add('splash-hide');
+            setTimeout(function() {
+              if (splash.parentNode) splash.remove();
+            }, 800);
+          }, remaining);
+        }
+        var observer = new MutationObserver(function(mutations) {
+          for (var i = 0; i < mutations.length; i++) {
+            if (mutations[i].addedNodes.length > 0 && document.getElementById('root').children.length > 0) {
+              observer.disconnect(); hideSplash(); return;
+            }
+          }
+        });
+        observer.observe(document.getElementById('root'), { childList: true });
+        setTimeout(function() { observer.disconnect(); hideSplash(); }, 5000);
+      })();
+    </script>
+
+    <!-- 新手引导自动触发 -->
+    <script>
+    (function() {
+      var guideChecked = false;
+      function checkGuide() {
+        if (guideChecked) return;
+        var token = localStorage.getItem('shitabing_token');
+        if (!token) return; // 未登录不触发
+
+        var done = localStorage.getItem('shitabing_guide_done');
+        var lastTime = parseInt(localStorage.getItem('shitabing_guide_time') || '0');
+        var now = Date.now();
+        var THREE_DAYS = 3 * 24 * 60 * 60 * 1000;
+
+        // 从未完成引导，或超过3天未访问
+        if (!done || (now - lastTime > THREE_DAYS)) {
+          guideChecked = true;
+          // 延迟跳转，等SPA先渲染完
+          setTimeout(function() {
+            window.location.href = '/guide.html';
+          }, 800);
+        }
+      }
+
+      // 定时检查（等待登录完成）
+      setInterval(checkGuide, 1000);
+      // 首次也检查
+      setTimeout(checkGuide, 500);
+    })();
+    </script>
+  </body>
+</html>
+
+<script>
+</script>
+
+<script>
+// 盟主邀请码注册
+(function() {
+  function getToken() { return localStorage.getItem('shitabing_token') || ''; }
+  function esc(s) { var d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+
+  function injectRegisterBtn() {
+    var loginPage = document.querySelector('.min-h-screen.bg-primary');
+    if (!loginPage) return;
+    // 找到"提交入盟申请"按钮，在其下方加"盟主注册"
+    var btns = loginPage.querySelectorAll('button');
+    var applyBtn = null;
+    btns.forEach(function(b) { if (b.textContent.indexOf('入盟申请') >= 0) applyBtn = b; });
+    if (!applyBtn) return;
+    if (document.getElementById('alliance-register-btn')) return;
+
+    var btn = document.createElement('button');
+    btn.id = 'alliance-register-btn';
+    btn.className = 'btn-secondary w-full';
+    btn.style.marginTop = '8px';
+    btn.textContent = '盟主注册';
+    btn.onclick = function() { openRegisterModal(); };
+    applyBtn.parentNode.insertBefore(btn, applyBtn.nextSibling);
+  }
+
+  function openRegisterModal() {
+    if (document.getElementById('alliance-register-modal')) return;
+    var modal = document.createElement('div');
+    modal.id = 'alliance-register-modal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);z-index:500;display:flex;align-items:center;justify-content:center;padding:16px';
+    modal.innerHTML =
+      '<div style="background:rgba(15,23,42,0.95);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.15);border-radius:16px;width:100%;max-width:420px;max-height:90vh;overflow-y:auto">'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.1)">'
+      + '  <b style="font-size:1rem">⚔ 盟主注册</b>'
+      + '  <button id="arm-close" style="background:none;border:none;color:#94A3B8;cursor:pointer;font-size:1.2rem">✕</button>'
+      + '</div>'
+      + '<div id="arm-body" style="padding:20px">'
+      // 第一步：输入邀请码
+      + '<div id="arm-step1">'
+      + '  <div style="margin-bottom:14px">'
+      + '    <label style="display:block;font-size:0.75rem;color:rgba(255,255,255,0.6);margin-bottom:4px;font-weight:500">邀请码</label>'
+      + '    <input id="arm-code" placeholder="请输入管理员提供的邀请码" style="background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#F8FAFC;padding:10px 14px;font-size:0.85rem;width:100%;font-family:inherit">'
+      + '  </div>'
+      + '  <div id="arm-step1-msg" style="font-size:0.8rem;margin-bottom:10px;min-height:20px"></div>'
+      + '  <button id="arm-check" style="width:100%;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,#00D4FF,#0088CC);color:#000;font-weight:600;font-size:0.85rem;cursor:pointer">验证邀请码</button>'
+      + '</div>'
+      // 第二步：填写注册信息（默认隐藏）
+      + '<div id="arm-step2" style="display:none">'
+      + '  <div style="margin-bottom:14px">'
+      + '    <label style="display:block;font-size:0.75rem;color:rgba(255,255,255,0.6);margin-bottom:4px;font-weight:500">同盟名称 <span style="color:rgba(255,255,255,0.35)">（可修改）</span></label>'
+      + '    <input id="arm-alliance" placeholder="你的同盟名称" style="background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#F8FAFC;padding:10px 14px;font-size:0.85rem;width:100%;font-family:inherit">'
+      + '  </div>'
+      + '  <div style="margin-bottom:14px">'
+      + '    <label style="display:block;font-size:0.75rem;color:rgba(255,255,255,0.6);margin-bottom:4px;font-weight:500">登录账号 *</label>'
+      + '    <input id="arm-username" placeholder="设置登录账号" style="background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#F8FAFC;padding:10px 14px;font-size:0.85rem;width:100%;font-family:inherit">'
+      + '  </div>'
+      + '  <div style="margin-bottom:14px">'
+      + '    <label style="display:block;font-size:0.75rem;color:rgba(255,255,255,0.6);margin-bottom:4px;font-weight:500">登录密码 *</label>'
+      + '    <input id="arm-password" type="password" placeholder="至少6位" style="background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#F8FAFC;padding:10px 14px;font-size:0.85rem;width:100%;font-family:inherit">'
+      + '  </div>'
+      + '  <div id="arm-step2-msg" style="font-size:0.8rem;margin-bottom:10px;min-height:20px"></div>'
+      + '  <button id="arm-register" style="width:100%;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,#F59E0B,#D97706);color:#000;font-weight:600;font-size:0.85rem;cursor:pointer">创建同盟并注册</button>'
+      + '</div>'
+      + '</div></div>';
+    document.body.appendChild(modal);
+
+    // 关闭
+    document.getElementById('arm-close').onclick = function() { modal.remove(); };
+    modal.addEventListener('click', function(e) { if (e.target === modal) modal.remove(); });
+
+    // 验证邀请码
+    document.getElementById('arm-check').onclick = async function() {
+      var code = document.getElementById('arm-code').value.trim();
+      var msgEl = document.getElementById('arm-step1-msg');
+      if (!code) { msgEl.innerHTML = '<span style="color:#EF4444">请输入邀请码</span>'; return; }
+      msgEl.innerHTML = '<span style="color:rgba(255,255,255,0.4)">验证中...</span>';
+      try {
+        var resp = await fetch('/api/auth/check-invite/' + encodeURIComponent(code));
+        var data = await resp.json();
+        if (!data.valid) {
+          msgEl.innerHTML = '<span style="color:#EF4444">' + esc(data.error || '邀请码无效') + '</span>';
+          return;
+        }
+        // 验证通过，显示第二步
+        document.getElementById('arm-step1').style.display = 'none';
+        document.getElementById('arm-step2').style.display = 'block';
+        if (data.alliance_name) document.getElementById('arm-alliance').value = data.alliance_name;
+      } catch(e) {
+        msgEl.innerHTML = '<span style="color:#EF4444">' + esc(e.message) + '</span>';
+      }
+    };
+
+    // 邀请码回车验证
+    document.getElementById('arm-code').onkeydown = function(e) { if (e.key === 'Enter') document.getElementById('arm-check').click(); };
+
+    // 注册
+    document.getElementById('arm-register').onclick = async function() {
+      var code = document.getElementById('arm-code').value.trim();
+      var allianceName = document.getElementById('arm-alliance').value.trim();
+      var username = document.getElementById('arm-username').value.trim();
+      var password = document.getElementById('arm-password').value;
+      var msgEl = document.getElementById('arm-step2-msg');
+
+      if (!username) { msgEl.innerHTML = '<span style="color:#EF4444">请填写登录账号</span>'; return; }
+      if (!password || password.length < 6) { msgEl.innerHTML = '<span style="color:#EF4444">密码至少6位</span>'; return; }
+
+      msgEl.innerHTML = '<span style="color:rgba(255,255,255,0.4)">注册中...</span>';
+      try {
+        var resp = await fetch('/api/auth/register-with-invite', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ invite_code: code, username: username, password: password, alliance_name: allianceName })
+        });
+        var data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || '注册失败');
+        // 注册成功，保存token并跳转
+        localStorage.setItem('shitabing_token', data.token);
+        localStorage.setItem('shitabing_user', JSON.stringify(data.user));
+        modal.remove();
+        window.location.href = '/';
+      } catch(e) {
+        msgEl.innerHTML = '<span style="color:#EF4444">' + esc(e.message) + '</span>';
+      }
+    };
+  }
+
+  // 监听DOM变化，在登录页注入按钮
+  var observer = new MutationObserver(function() { injectRegisterBtn(); });
+  observer.observe(document.getElementById('root'), { childList: true, subtree: true });
+  setInterval(injectRegisterBtn, 500);
+})();
+</script>
+
+<script>
+// 登录页背景图 + 窗口透明
+(function() {
+  function setupLogin() {
+    var el = document.querySelector('.min-h-screen.bg-primary');
+    if (el && !el.dataset.bgSet) {
+      el.style.setProperty('background', 'linear-gradient(rgba(10,14,26,0.4), rgba(10,14,26,0.6)), url(/assets/login-bg.png) center / cover no-repeat', 'important');
+      el.style.setProperty('backdrop-filter', 'none', 'important');
+      el.dataset.bgSet = '1';
+    }
+    // 登录窗口透明
+    var card = document.querySelector('.max-w-md');
+    if (card && !card.dataset.transparent) {
+      card.style.setProperty('background', 'rgba(10, 14, 26, 0.25)', 'important');
+      card.style.setProperty('backdrop-filter', 'blur(8px)', 'important');
+      card.style.setProperty('border', '1px solid rgba(255,255,255,0.06)', 'important');
+      card.style.setProperty('border-radius', '16px', 'important');
+      card.dataset.transparent = '1';
+    }
+  }
+  var observer = new MutationObserver(function() { setupLogin(); });
+  observer.observe(document.getElementById('root'), { childList: true, subtree: true });
+  setInterval(setupLogin, 500);
+})();
+</script>
+
+<script>
+// 团管理 - 注入到成员管理页面
+(function() {
+  var groupBtnInjected = false;
+  var overlayOpen = false;
+
+  function getToken() { return localStorage.getItem('shitabing_token') || ''; }
+
+  async function api(path, opts) {
+    opts = opts || {};
+    var headers = { 'Content-Type': 'application/json' };
+    var t = getToken(); if (t) headers.Authorization = 'Bearer ' + t;
+    var resp = await fetch('/api' + path, { method: opts.method || 'GET', headers: headers, body: opts.body ? JSON.stringify(opts.body) : undefined });
+    if (resp.status === 401) { location.href = '/'; return null; }
+    var data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || '请求失败');
+    return data;
+  }
+
+  function esc(s) { var d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+
+  function injectBtn() {
+    if (groupBtnInjected) return;
+    if (location.pathname !== '/member') return;
+    var header = document.querySelector('h1');
+    if (!header) return;
+    var actionsDiv = header.closest('div');
+    if (!actionsDiv) return;
+    var parent = actionsDiv.parentElement;
+    if (!parent) return;
+    var btnWrap = parent.querySelector('.flex.flex-wrap.gap-2');
+    if (!btnWrap) return;
+    if (btnWrap.querySelector('.group-mgr-btn')) return;
+    var btn = document.createElement('button');
+    btn.className = 'btn-secondary group-mgr-btn';
+    btn.textContent = '团管理';
+    btn.style.cssText = 'margin-left:4px';
+    btn.onclick = openGroupOverlay;
+    btnWrap.appendChild(btn);
+    groupBtnInjected = true;
+  }
+
+  function openGroupOverlay() {
+    if (overlayOpen) return;
+    overlayOpen = true;
+    var overlay = document.createElement('div');
+    overlay.id = 'group-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);overflow-y:auto';
+    overlay.innerHTML = '<div style="max-width:1100px;margin:20px auto;padding:0 16px">'
+      + '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding:14px 20px;background:rgba(255,255,255,0.06);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.12);border-radius:14px">'
+      + '  <a href="javascript:void(0)" onclick="document.getElementById(\'group-overlay\').remove()" style="color:#00D4FF;text-decoration:none;font-size:0.85rem;cursor:pointer">← 返回成员管理</a>'
+      + '  <div style="flex:1"><b style="font-size:1.1rem">⚔ 团管理</b><div style="font-size:0.75rem;color:rgba(255,255,255,0.45)">管理分组、团长任命、成员分配</div></div>'
+      + '  <button onclick="window._groupMgr.create()" style="padding:8px 16px;border-radius:10px;border:none;background:linear-gradient(135deg,#00D4FF,#0088CC);color:#000;font-weight:500;font-size:0.8rem;cursor:pointer">+ 新建团</button>'
+      + '</div>'
+      + '<div id="gm-tabs" style="display:flex;gap:4px;padding:4px;background:rgba(30,41,59,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:10px;margin-bottom:16px">'
+      + '  <div class="gm-tab active" data-t="groups" onclick="window._groupMgr.switchTab(\'groups\')" style="padding:8px 16px;border-radius:8px;font-size:0.8rem;cursor:pointer;background:rgba(0,212,255,0.15);color:#00D4FF;font-weight:500">团列表</div>'
+      + '  <div class="gm-tab" data-t="unassigned" onclick="window._groupMgr.switchTab(\'unassigned\')" style="padding:8px 16px;border-radius:8px;font-size:0.8rem;cursor:pointer;color:rgba(255,255,255,0.5)">未分组成员</div>'
+      + '</div>'
+      + '<div id="gm-msg"></div>'
+      + '<div id="gm-content"></div>'
+      + '</div>';
+    document.body.appendChild(overlay);
+    window._groupMgr.load();
+  }
+
+  window._closeModal = function(btn) {
+    var el = btn.parentElement;
+    while (el) {
+      if (el.style && el.style.position === 'fixed') {
+        el.remove();
+        overlayOpen = false;
+        return;
+      }
+      el = el.parentElement;
+    }
+  };
+
+  window._groupMgr = {
+    groups: [], allMembers: [],
+
+    switchTab: function(t) {
+      document.querySelectorAll('.gm-tab').forEach(function(el) {
+        var active = el.dataset.t === t;
+        el.style.background = active ? 'rgba(0,212,255,0.15)' : '';
+        el.style.color = active ? '#00D4FF' : 'rgba(255,255,255,0.5)';
+        el.style.fontWeight = active ? '500' : '';
+        el.classList.toggle('active', active);
+      });
+      if (t === 'groups') this.renderGroups();
+      else this.renderUnassigned();
+    },
+
+    msg: function(text, ok) {
+      var el = document.getElementById('gm-msg');
+      if (!el) return;
+      el.innerHTML = '<div style="padding:8px 14px;border-radius:10px;font-size:0.8rem;margin-bottom:12px;background:rgba(' + (ok ? '34,197,94' : '239,68,68') + ',0.12);color:' + (ok ? '#22C55E' : '#EF4444') + ';border:1px solid rgba(' + (ok ? '34,197,94' : '239,68,68') + ',0.2)">' + esc(text) + '</div>';
+      setTimeout(function() { if (el) el.innerHTML = ''; }, 3000);
+    },
+
+    load: async function() {
+      try {
+        var self = this;
+        var r = await Promise.all([api('/members/groups'), api('/members')]);
+        self.groups = r[0]; self.allMembers = r[1];
+        self.renderGroups();
+      } catch(e) { this.msg(e.message, false); }
+    },
+
+    renderGroups: function() {
+      var el = document.getElementById('gm-content');
+      if (!el) return;
+      var self = this;
+      if (!self.groups.length) { el.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.35)">暂无分团</div>'; return; }
+      el.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px">' + self.groups.map(function(g) {
+        return '<div style="background:rgba(255,255,255,0.06);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:20px">'
+          + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
+          + '  <div><b>' + esc(g.name) + '</b> <span style="display:inline-flex;align-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:10px;font-size:0.7rem;font-weight:600;background:rgba(0,212,255,0.2);color:#00D4FF">' + g.member_count + '</span></div>'
+          + '  <div style="display:flex;gap:6px">'
+          + '    <button onclick="window._groupMgr.edit(' + g.id + ')" style="padding:4px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:#F8FAFC;font-size:0.7rem;cursor:pointer">编辑</button>'
+          + '    <button onclick="window._groupMgr.del(' + g.id + ')" style="padding:4px 10px;border-radius:8px;border:none;background:rgba(239,68,68,0.7);color:#fff;font-size:0.7rem;cursor:pointer">删除</button>'
+          + '  </div>'
+          + '</div>'
+          + (g.description ? '<div style="font-size:0.8rem;color:rgba(255,255,255,0.5);margin-bottom:8px">' + esc(g.description) + '</div>' : '')
+          + '<div style="display:flex;gap:16px;font-size:0.75rem;color:rgba(255,255,255,0.45);margin-bottom:8px">'
+          + '  <span>团长: <b style="color:#F8FAFC">' + esc(g.leader_name || '未任命') + '</b></span>'
+          + '  <span>成员: <b style="color:#F8FAFC">' + g.member_count + '</b></span>'
+          + '</div>'
+          + '<div style="height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;margin-bottom:12px"><div style="height:100%;width:' + Math.min(100, g.member_count * 10) + '%;background:linear-gradient(90deg,#00D4FF,#22C55E);border-radius:2px"></div></div>'
+          + '<div style="display:flex;gap:8px;flex-wrap:wrap">'
+          + '  <button onclick="window._groupMgr.showMembers(' + g.id + ')" style="padding:5px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:#F8FAFC;font-size:0.75rem;cursor:pointer">查看成员</button>'
+          + '  <button onclick="window._groupMgr.assign(' + g.id + ')" style="padding:5px 12px;border-radius:8px;border:none;background:rgba(34,197,94,0.7);color:#000;font-size:0.75rem;cursor:pointer;font-weight:500">添加成员</button>'
+          + '</div>'
+          + '<div id="gml-' + g.id + '"></div>'
+          + '</div>';
+      }).join('') + '</div>';
+    },
+
+    showMembers: async function(gid) {
+      var el = document.getElementById('gml-' + gid);
+      if (!el) return;
+      if (el.innerHTML) { el.innerHTML = ''; return; }
+      try {
+        var list = await api('/members/groups/' + gid + '/members');
+        if (!list.length) { el.innerHTML = '<div style="font-size:0.75rem;color:rgba(255,255,255,0.35);margin-top:8px">暂无成员</div>'; return; }
+        var self = this;
+        el.innerHTML = '<div style="max-height:260px;overflow-y:auto;margin-top:8px">' + list.map(function(m) {
+          var rc = m.role === '盟主' ? '#F59E0B' : m.role === '副盟' ? '#3B82F6' : m.role === '团长' ? '#22C55E' : '#94A3B8';
+          return '<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-radius:8px;font-size:0.8rem">'
+            + '<div><span style="font-weight:500">' + esc(m.nickname) + '</span> <span style="font-size:0.7rem;color:rgba(255,255,255,0.35)">' + esc(m.game_id) + '</span></div>'
+            + '<div style="display:flex;gap:6px;align-items:center">'
+            + '  <span style="padding:1px 6px;border-radius:10px;font-size:0.65rem;background:rgba(255,255,255,0.06);color:' + rc + '">' + m.role + '</span>'
+            + '  <span style="font-size:0.7rem;color:rgba(255,255,255,0.4)">军功 ' + m.total_merit + '</span>'
+            + '  <button onclick="window._groupMgr.remove(' + m.id + ',' + gid + ')" style="padding:2px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:rgba(255,255,255,0.5);font-size:0.65rem;cursor:pointer">移出</button>'
+            + '</div></div>';
+        }).join('') + '</div>';
+      } catch(e) { this.msg(e.message, false); }
+    },
+
+    remove: async function(mid, gid) {
+      if (!confirm('确认将该成员移出此团？')) return;
+      try {
+        await api('/members/' + mid, { method: 'PUT', body: { group_id: null } });
+        this.msg('已移出'); await this.load();
+        this.showMembers(gid);
+      } catch(e) { this.msg(e.message, false); }
+    },
+
+    create: function() {
+      this._modal('新建团', [
+        { label: '团名', key: 'name', required: true },
+        { label: '描述', key: 'description', type: 'textarea' }
+      ], async function(data) {
+        await api('/members/groups', { method: 'POST', body: data });
+        window._groupMgr.msg('创建成功'); await window._groupMgr.load();
+      });
+    },
+
+    edit: function(gid) {
+      var g = this.groups.find(function(x) { return x.id === gid; });
+      if (!g) return;
+      var opts = [{ value: '', label: '不指定' }];
+      this.allMembers.filter(function(m) { return m.status !== '离盟'; }).forEach(function(m) {
+        opts.push({ value: m.id, label: m.nickname + ' (' + m.game_id + ')' });
+      });
+      this._modal('编辑 ' + g.name, [
+        { label: '团名', key: 'name', value: g.name, required: true },
+        { label: '描述', key: 'description', value: g.description || '', type: 'textarea' },
+        { label: '团长', key: 'leader_id', value: g.leader_id || '', type: 'select', options: opts }
+      ], async function(data) {
+        data.leader_id = data.leader_id ? Number(data.leader_id) : null;
+        await api('/members/groups/' + gid, { method: 'PUT', body: data });
+        window._groupMgr.msg('保存成功'); await window._groupMgr.load();
+      });
+    },
+
+    assign: function(gid) {
+      var g = this.groups.find(function(x) { return x.id === gid; });
+      if (!g) return;
+      var unassigned = this.allMembers.filter(function(m) { return !m.group_id && m.status !== '离盟'; });
+      var fromOther = this.allMembers.filter(function(m) { return m.group_id && m.group_id !== gid && m.status !== '离盟'; });
+      var self = this;
+      var opts = unassigned.concat(fromOther);
+      if (!opts.length) { this.msg('所有成员都已分组', true); return; }
+      var modal = document.createElement('div');
+      modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);z-index:300;display:flex;align-items:center;justify-content:center';
+      var html = '<div style="background:rgba(15,23,42,0.95);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.15);border-radius:16px;width:90%;max-width:460px;max-height:80vh;overflow:auto">'
+        + '<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.1)"><b>添加成员到 ' + esc(g.name) + '</b><button onclick="window._closeModal(this)" style="background:none;border:none;color:#94A3B8;cursor:pointer;font-size:1.1rem">✕</button></div>'
+        + '<div style="padding:16px;max-height:300px;overflow-y:auto">';
+      opts.forEach(function(m) {
+        var gn = m.group_id ? (self.groups.find(function(gg) { return gg.id === m.group_id; }) || {}).name || '?' : '未分组';
+        html += '<label style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;cursor:pointer;font-size:0.8rem"><input type="checkbox" value="' + m.id + '" style="width:16px;height:16px;accent-color:#00D4FF">' + esc(m.nickname) + ' (' + esc(m.game_id) + ') - ' + esc(gn) + '</label>';
+      });
+      html += '</div><div style="display:flex;justify-content:flex-end;gap:8px;padding:12px 20px;border-top:1px solid rgba(255,255,255,0.1)">'
+        + '<button onclick="window._closeModal(this)" style="padding:8px 16px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:#F8FAFC;font-size:0.8rem;cursor:pointer">取消</button>'
+        + '<button id="assign-ok" style="padding:8px 16px;border-radius:10px;border:none;background:linear-gradient(135deg,#00D4FF,#0088CC);color:#000;font-weight:500;font-size:0.8rem;cursor:pointer">确认添加</button></div></div>';
+      modal.innerHTML = html;
+      document.body.appendChild(modal);
+      modal.querySelector('#assign-ok').onclick = async function() {
+        var checked = Array.from(modal.querySelectorAll('input[type=checkbox]:checked')).map(function(c) { return Number(c.value); });
+        if (!checked.length) { self.msg('请勾选成员', false); return; }
+        try {
+          await api('/members/groups/' + gid + '/assign', { method: 'POST', body: { member_ids: checked } });
+          modal.remove(); self.msg('已添加 ' + checked.length + ' 人'); await self.load();
+        } catch(e) { self.msg(e.message, false); }
+      };
+    },
+
+    del: async function(gid) {
+      var g = this.groups.find(function(x) { return x.id === gid; });
+      if (!g) return;
+      if (g.member_count > 0) { this.msg('团内仍有 ' + g.member_count + ' 人，请先移出', false); return; }
+      if (!confirm('确认删除「' + g.name + '」？')) return;
+      try { await api('/members/groups/' + gid, { method: 'DELETE' }); this.msg('已删除'); await this.load(); } catch(e) { this.msg(e.message, false); }
+    },
+
+    renderUnassigned: function() {
+      var el = document.getElementById('gm-content');
+      if (!el) return;
+      var self = this;
+      var unassigned = this.allMembers.filter(function(m) { return !m.group_id && m.status !== '离盟'; });
+      if (!unassigned.length) { el.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.35)">所有成员都已分组 ✓</div>'; return; }
+      el.innerHTML = '<div style="background:rgba(255,255,255,0.06);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:20px">'
+        + '<div style="font-weight:600;margin-bottom:12px">未分组成员 <span style="display:inline-flex;min-width:20px;height:20px;padding:0 6px;border-radius:10px;font-size:0.7rem;font-weight:600;background:rgba(0,212,255,0.2);color:#00D4FF">' + unassigned.length + '</span></div>'
+        + '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:0.8rem">'
+        + '<thead><tr><th style="background:rgba(0,128,255,0.06);color:rgba(255,255,255,0.6);font-weight:600;font-size:0.7rem;text-transform:uppercase;padding:10px 14px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.08)">昵称</th>'
+        + '<th style="background:rgba(0,128,255,0.06);color:rgba(255,255,255,0.6);font-weight:600;font-size:0.7rem;text-transform:uppercase;padding:10px 14px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.08)">游戏ID</th>'
+        + '<th style="background:rgba(0,128,255,0.06);color:rgba(255,255,255,0.6);font-weight:600;font-size:0.7rem;text-transform:uppercase;padding:10px 14px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.08)">军功</th>'
+        + '<th style="background:rgba(0,128,255,0.06);color:rgba(255,255,255,0.6);font-weight:600;font-size:0.7rem;text-transform:uppercase;padding:10px 14px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.08)">快速分配</th></tr></thead><tbody>'
+        + unassigned.map(function(m) {
+          return '<tr><td style="padding:8px 14px;border-bottom:1px solid rgba(255,255,255,0.04);font-weight:500">' + esc(m.nickname) + '</td>'
+            + '<td style="padding:8px 14px;border-bottom:1px solid rgba(255,255,255,0.04);color:rgba(255,255,255,0.5)">' + esc(m.game_id) + '</td>'
+            + '<td style="padding:8px 14px;border-bottom:1px solid rgba(255,255,255,0.04)">' + m.total_merit + '</td>'
+            + '<td style="padding:8px 14px;border-bottom:1px solid rgba(255,255,255,0.04)"><select onchange="window._groupMgr.quickAssign(' + m.id + ',this.value)" style="width:auto;min-width:100px;padding:4px 8px;font-size:0.75rem;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#F8FAFC">'
+            + '<option value="">分配到团...</option>'
+            + self.groups.map(function(g) { return '<option value="' + g.id + '">' + esc(g.name) + '</option>'; }).join('')
+            + '</select></td></tr>';
+        }).join('') + '</tbody></table></div></div>';
+    },
+
+    quickAssign: async function(mid, gid) {
+      if (!gid) return;
+      try {
+        await api('/members/groups/' + gid + '/assign', { method: 'POST', body: { member_ids: [mid] } });
+        var g = this.groups.find(function(x) { return x.id == gid; });
+        this.msg('已分配到 ' + (g ? g.name : '团'));
+        await this.load(); this.renderUnassigned();
+      } catch(e) { this.msg(e.message, false); }
+    },
+
+    _modal: function(title, fields, onSave) {
+      var modal = document.createElement('div');
+      modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);z-index:300;display:flex;align-items:center;justify-content:center';
+      var html = '<div style="background:rgba(15,23,42,0.95);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.15);border-radius:16px;width:90%;max-width:480px">'
+        + '<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.1)"><b>' + esc(title) + '</b><button onclick="window._closeModal(this)" style="background:none;border:none;color:#94A3B8;cursor:pointer;font-size:1.1rem">✕</button></div>'
+        + '<div style="padding:20px">';
+      fields.forEach(function(f) {
+        html += '<div style="margin-bottom:14px"><label style="display:block;font-size:0.75rem;color:rgba(255,255,255,0.6);margin-bottom:4px;font-weight:500">' + f.label + (f.required ? ' *' : '') + '</label>';
+        if (f.type === 'textarea') {
+          html += '<textarea id="gf-' + f.key + '" rows="3" style="background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#F8FAFC;padding:10px 14px;font-size:0.85rem;width:100%;font-family:inherit">' + esc(f.value || '') + '</textarea>';
+        } else if (f.type === 'select') {
+          html += '<select id="gf-' + f.key + '" style="background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#F8FAFC;padding:10px 14px;font-size:0.85rem;width:100%;font-family:inherit">'
+            + (f.options || []).map(function(o) { return '<option value="' + o.value + '"' + (o.value == f.value ? ' selected' : '') + '>' + esc(o.label) + '</option>'; }).join('')
+            + '</select>';
+        } else {
+          html += '<input id="gf-' + f.key + '" value="' + esc(f.value || '') + '" style="background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#F8FAFC;padding:10px 14px;font-size:0.85rem;width:100%;font-family:inherit">';
+        }
+        html += '</div>';
+      });
+      html += '</div><div style="display:flex;justify-content:flex-end;gap:8px;padding:12px 20px;border-top:1px solid rgba(255,255,255,0.1)">'
+        + '<button onclick="window._closeModal(this)" style="padding:8px 16px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:#F8FAFC;font-size:0.8rem;cursor:pointer">取消</button>'
+        + '<button id="gf-save" style="padding:8px 16px;border-radius:10px;border:none;background:linear-gradient(135deg,#00D4FF,#0088CC);color:#000;font-weight:500;font-size:0.8rem;cursor:pointer">保存</button></div></div>';
+      modal.innerHTML = html;
+      document.body.appendChild(modal);
+      var self = this;
+      modal.querySelector('#gf-save').onclick = async function() {
+        var data = {};
+        for (var i = 0; i < fields.length; i++) {
+          var f = fields[i];
+          var el = modal.querySelector('#gf-' + f.key);
+          data[f.key] = el.value.trim();
+          if (f.required && !data[f.key]) { self.msg('请填写' + f.label, false); return; }
+        }
+        try { await onSave(data); modal.remove(); } catch(e) { self.msg(e.message, false); }
+      };
+    }
+  };
+
+  // 监听路由变化，注入按钮
+  var lastPath = '';
+  function checkRoute() {
+    if (location.pathname === '/member' && location.pathname !== lastPath) {
+      lastPath = location.pathname;
+      groupBtnInjected = false;
+      setTimeout(injectBtn, 500);
+      setTimeout(injectBtn, 1000);
+      setTimeout(injectBtn, 2000);
+    } else if (location.pathname !== '/member') {
+      lastPath = location.pathname;
+      groupBtnInjected = false;
+    }
+  }
+  setInterval(checkRoute, 500);
+})();
+</script>
+
+<script>
+// Root 用户：隐藏游戏相关菜单，只保留管理功能
+(function() {
+  function getUser() { try { return JSON.parse(localStorage.getItem('shitabing_user') || 'null'); } catch(e) { return null; } }
+
+  var hideLabels = ['打城管理', '武勋', '军功商场', '战场管理', '排行榜', '赛季奖励', '使用教程', 'AI 军师', '邮件中心', '团报报表'];
+
+  function filterMenu() {
+    var user = getUser();
+    if (!user || user.role !== 'root') return;
+
+    // 桌面侧边栏
+    var sidebar = document.querySelector('aside');
+    if (sidebar) {
+      var links = sidebar.querySelectorAll('a, button, [class*="sidebar-link"]');
+      links.forEach(function(el) {
+        var text = el.textContent || '';
+        for (var i = 0; i < hideLabels.length; i++) {
+          if (text.indexOf(hideLabels[i]) >= 0) {
+            el.style.display = 'none';
+            // 如果是展开的子菜单容器，也隐藏
+            var parent = el.parentElement;
+            if (parent && parent.tagName === 'DIV' && parent.children.length <= 2) {
+              parent.style.display = 'none';
+            }
+            break;
+          }
+        }
+      });
+    }
+
+    // 移动端抽屉菜单
+    var drawer = document.querySelector('[class*="fixed"][class*="left-0"]');
+    if (drawer) {
+      var drawerLinks = drawer.querySelectorAll('a, button, [class*="sidebar-link"]');
+      drawerLinks.forEach(function(el) {
+        var text = el.textContent || '';
+        for (var i = 0; i < hideLabels.length; i++) {
+          if (text.indexOf(hideLabels[i]) >= 0) {
+            el.style.display = 'none';
+            break;
+          }
+        }
+      });
+    }
+  }
+
+  var observer = new MutationObserver(function() { setTimeout(filterMenu, 100); });
+  observer.observe(document.getElementById('root'), { childList: true, subtree: true });
+  setInterval(filterMenu, 500);
+})();
+</script>
+
+<script>
+// 标题输入框放大字体
+(function() {
+  function enlargeTitleInput() {
+    var labels = document.querySelectorAll('label, .label');
+    labels.forEach(function(lb) {
+      if ((lb.textContent || '').indexOf('标题文案') >= 0) {
+        var parent = lb.closest('div');
+        if (!parent) return;
+        var input = parent.querySelector('input');
+        if (input && !input.dataset.enlarged) {
+          input.dataset.enlarged = '1';
+          input.style.setProperty('font-size', '1.25rem', 'important');
+          input.style.setProperty('font-weight', '600', 'important');
+          input.style.setProperty('padding', '12px 16px', 'important');
+          input.style.setProperty('letter-spacing', '0.05em', 'important');
+        }
+      }
+    });
+  }
+  var observer = new MutationObserver(function() { setTimeout(enlargeTitleInput, 100); });
+  observer.observe(document.getElementById('root'), { childList: true, subtree: true });
+  setInterval(enlargeTitleInput, 500);
+})();
+
+// 盟主隐藏软件授权 Tab
+(function() {
+  function getUser() { try { return JSON.parse(localStorage.getItem('shitabing_user') || 'null'); } catch(e) { return null; } }
+  function hideLicense() {
+    var user = getUser();
+    if (!user || user.role === 'root') return;
+    // 隐藏设置页中的"软件授权"Tab按钮
+    document.querySelectorAll('button, [role="tab"], [class*="tab"]').forEach(function(el) {
+      if ((el.textContent || '').indexOf('软件授权') >= 0) el.style.display = 'none';
+    });
+  }
+  var observer = new MutationObserver(function() { setTimeout(hideLicense, 100); });
+  observer.observe(document.getElementById('root'), { childList: true, subtree: true });
+  setInterval(hideLicense, 500);
+})();
+</script>
+
+<script>
+// Root 管理面板 - 邀请码 & 盟主查看
+(function() {
+  function getToken() { return localStorage.getItem('shitabing_token') || ''; }
+  function getUser() { try { return JSON.parse(localStorage.getItem('shitabing_user') || 'null'); } catch(e) { return null; } }
+  function esc(s) { var d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+
+  async function api(path, opts) {
+    opts = opts || {};
+    var headers = { 'Content-Type': 'application/json' };
+    var t = getToken(); if (t) headers.Authorization = 'Bearer ' + t;
+    var resp = await fetch('/api' + path, { method: opts.method || 'GET', headers: headers, body: opts.body ? JSON.stringify(opts.body) : undefined });
+    if (resp.status === 401) { location.href = '/'; return null; }
+    var data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || '请求失败');
+    return data;
+  }
+
+  var injected = false;
+
+  function injectPanel() {
+    if (injected) return;
+    var user = getUser();
+    if (!user || user.role !== 'root') return;
+    if (location.pathname !== '/setting' && location.pathname !== '/settings') return;
+
+    var main = document.querySelector('main');
+    if (!main) return;
+    var cards = main.querySelectorAll('.card, [class*="card"]');
+    if (cards.length === 0) return;
+
+    injected = true;
+
+    var panel = document.createElement('div');
+    panel.id = 'root-mgmt-panel';
+    panel.style.cssText = 'margin-top:20px';
+    panel.innerHTML =
+      '<div style="background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.2);border-radius:16px;padding:20px;margin-bottom:16px">'
+      + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">'
+      + '  <span style="font-size:1.3rem">👑</span>'
+      + '  <div><b style="font-size:1.1rem;color:#00D4FF">Root 管理面板</b>'
+      + '  <div style="font-size:0.75rem;color:rgba(255,255,255,0.45)">邀请码管理 · 盟主数据总览（仅 root 可见）</div></div>'
+      + '</div>'
+      + '<div id="root-tabs" style="display:flex;gap:4px;padding:4px;background:rgba(30,41,59,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:10px;margin-bottom:16px">'
+      + '  <div class="root-tab active" data-t="invites" onclick="window._rootMgr.switchTab(\'invites\')" style="padding:8px 16px;border-radius:8px;font-size:0.8rem;cursor:pointer;background:rgba(0,212,255,0.15);color:#00D4FF;font-weight:500">📋 邀请码</div>'
+      + '  <div class="root-tab" data-t="alliances" onclick="window._rootMgr.switchTab(\'alliances\')" style="padding:8px 16px;border-radius:8px;font-size:0.8rem;cursor:pointer;color:rgba(255,255,255,0.5)">📊 盟主总览</div>'
+      + '</div>'
+      + '<div id="root-msg"></div>'
+      + '<div id="root-content"></div>'
+      + '</div>';
+
+    cards[0].parentNode.insertBefore(panel, cards[0]);
+    window._rootMgr.load();
+  }
+
+  window._rootMgr = {
+    invites: [],
+    alliances: [],
+
+    switchTab: function(t) {
+      document.querySelectorAll('.root-tab').forEach(function(el) {
+        var active = el.dataset.t === t;
+        el.style.background = active ? 'rgba(0,212,255,0.15)' : '';
+        el.style.color = active ? '#00D4FF' : 'rgba(255,255,255,0.5)';
+        el.style.fontWeight = active ? '500' : '';
+      });
+      if (t === 'invites') this.renderInvites();
+      else this.renderAlliances();
+    },
+
+    msg: function(text, ok) {
+      var el = document.getElementById('root-msg');
+      if (!el) return;
+      el.innerHTML = '<div style="padding:8px 14px;border-radius:10px;font-size:0.8rem;margin-bottom:12px;background:rgba(' + (ok ? '34,197,94' : '239,68,68') + ',0.12);color:' + (ok ? '#22C55E' : '#EF4444') + ';border:1px solid rgba(' + (ok ? '34,197,94' : '239,68,68') + ',0.2)">' + esc(text) + '</div>';
+      setTimeout(function() { if (el) el.innerHTML = ''; }, 3000);
+    },
+
+    load: async function() {
+      try {
+        var r = await Promise.all([api('/settings/invite-codes'), api('/settings/alliances')]);
+        this.invites = r[0];
+        this.alliances = r[1];
+        this.renderInvites();
+      } catch(e) { this.msg(e.message, false); }
+    },
+
+    renderInvites: function() {
+      var el = document.getElementById('root-content');
+      if (!el) return;
+      var self = this;
+      var html = '<div style="display:flex;justify-content:flex-end;margin-bottom:12px">'
+        + '<button onclick="window._rootMgr.createInvite()" style="padding:8px 16px;border-radius:10px;border:none;background:linear-gradient(135deg,#00D4FF,#0088CC);color:#000;font-weight:500;font-size:0.8rem;cursor:pointer">+ 创建邀请码</button></div>';
+
+      if (!self.invites.length) {
+        html += '<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.35)">暂无邀请码，点击上方按钮创建</div>';
+      } else {
+        html += '<div style="display:grid;gap:10px">';
+        self.invites.forEach(function(c) {
+          var expired = c.expires_at && new Date(c.expires_at) < new Date();
+          var usedUp = c.use_count >= c.max_uses;
+          var statusColor = expired ? '#EF4444' : usedUp ? '#F59E0B' : '#22C55E';
+          var statusText = expired ? '已过期' : usedUp ? '已用完' : '可用';
+          var sRgba = statusColor === '#22C55E' ? '34,197,94' : statusColor === '#F59E0B' ? '245,158,11' : '239,68,68';
+          html += '<div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">'
+            + '<div style="flex:1;min-width:200px">'
+            + '  <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'
+            + '    <code style="background:rgba(0,212,255,0.15);color:#00D4FF;padding:3px 10px;border-radius:6px;font-size:0.9rem;font-weight:600;letter-spacing:1px">' + esc(c.code) + '</code>'
+            + '    <span style="padding:2px 8px;border-radius:10px;font-size:0.65rem;background:rgba(' + sRgba + ',0.15);color:' + statusColor + '">' + statusText + '</span>'
+            + '  </div>'
+            + '  <div style="font-size:0.75rem;color:rgba(255,255,255,0.45)">同盟: ' + esc(c.alliance_name || '未指定') + ' · 已用 ' + c.use_count + '/' + c.max_uses + ' · ' + (c.expires_at ? '过期: ' + c.expires_at.split(' ')[0] : '永不过期') + '</div>'
+            + '</div>'
+            + '<div style="display:flex;gap:6px">'
+            + '  <button onclick="navigator.clipboard.writeText(\'' + esc(c.code) + '\');window._rootMgr.msg(\'已复制邀请码到剪贴板\',true)" style="padding:5px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:#F8FAFC;font-size:0.75rem;cursor:pointer">📋 复制</button>'
+            + '  <button onclick="window._rootMgr.deleteInvite(' + c.id + ')" style="padding:5px 12px;border-radius:8px;border:none;background:rgba(239,68,68,0.7);color:#fff;font-size:0.75rem;cursor:pointer">删除</button>'
+            + '</div></div>';
+        });
+        html += '</div>';
+      }
+      el.innerHTML = html;
+    },
+
+    renderAlliances: function() {
+      var el = document.getElementById('root-content');
+      if (!el) return;
+      var self = this;
+      var html = '';
+      if (!self.alliances.length) {
+        html += '<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.35)">暂无同盟（盟主注册后自动创建）</div>';
+      } else {
+        html += '<div style="display:grid;gap:12px">';
+        self.alliances.forEach(function(a) {
+          var barW = Math.min(100, a.member_count * 5);
+          html += '<div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:18px">'
+            + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
+            + '  <div style="display:flex;align-items:center;gap:8px">'
+            + '    <span style="font-size:1.1rem">🏰</span>'
+            + '    <b style="font-size:1rem">' + esc(a.name) + '</b>'
+            + '  </div>'
+            + '  <span style="padding:2px 8px;border-radius:10px;font-size:0.65rem;background:rgba(34,197,94,0.15);color:#22C55E">' + a.status + '</span>'
+            + '</div>'
+            + '<div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:10px;font-size:0.8rem;color:rgba(255,255,255,0.6)">'
+            + '  <div>盟主: <b style="color:#F59E0B;font-size:0.9rem">' + esc(a.owner_username || '未分配') + '</b></div>'
+            + '  <div>用户: <b style="color:#F8FAFC">' + a.user_count + '</b></div>'
+            + '  <div>成员: <b style="color:#F8FAFC">' + a.member_count + '</b></div>'
+            + (a.description ? '  <div style="color:rgba(255,255,255,0.35)">' + esc(a.description) + '</div>' : '')
+            + '</div>'
+            + '<div style="height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden">'
+            + '  <div style="height:100%;width:' + barW + '%;background:linear-gradient(90deg,#00D4FF,#22C55E);border-radius:2px"></div>'
+            + '</div>'
+            + '</div>';
+        });
+        html += '</div>';
+      }
+      el.innerHTML = html;
+    },
+
+    createInvite: function() {
+      var modal = document.createElement('div');
+      modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);z-index:500;display:flex;align-items:center;justify-content:center;padding:16px';
+      modal.innerHTML = '<div style="background:rgba(15,23,42,0.95);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.15);border-radius:16px;width:100%;max-width:420px">'
+        + '<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.1)"><b style="font-size:1rem">🔑 创建邀请码</b><button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:none;border:none;color:#94A3B8;cursor:pointer;font-size:1.2rem">✕</button></div>'
+        + '<div style="padding:20px">'
+        + '<div style="margin-bottom:14px"><label style="display:block;font-size:0.75rem;color:rgba(255,255,255,0.6);margin-bottom:4px">同盟名称</label><input id="ci-alliance" placeholder="例：龙虎盟（注册时可修改）" style="background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#F8FAFC;padding:10px 14px;font-size:0.85rem;width:100%;font-family:inherit"></div>'
+        + '<div style="display:flex;gap:12px;margin-bottom:14px">'
+        + '  <div style="flex:1"><label style="display:block;font-size:0.75rem;color:rgba(255,255,255,0.6);margin-bottom:4px">使用次数</label><input id="ci-max" type="number" value="1" min="1" max="100" style="background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#F8FAFC;padding:10px 14px;font-size:0.85rem;width:100%;font-family:inherit"></div>'
+        + '  <div style="flex:1"><label style="display:block;font-size:0.75rem;color:rgba(255,255,255,0.6);margin-bottom:4px">有效天数 <span style="color:rgba(255,255,255,0.3)">(0=永不过期)</span></label><input id="ci-days" type="number" value="30" min="0" style="background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#F8FAFC;padding:10px 14px;font-size:0.85rem;width:100%;font-family:inherit"></div>'
+        + '</div>'
+        + '<div id="ci-msg" style="font-size:0.8rem;margin-bottom:10px;min-height:20px"></div>'
+        + '<button id="ci-submit" style="width:100%;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,#00D4FF,#0088CC);color:#000;font-weight:600;font-size:0.85rem;cursor:pointer">生成邀请码</button>'
+        + '</div></div>';
+      document.body.appendChild(modal);
+
+      document.getElementById('ci-submit').onclick = async function() {
+        var allianceName = document.getElementById('ci-alliance').value.trim();
+        var maxUses = parseInt(document.getElementById('ci-max').value) || 1;
+        var days = parseInt(document.getElementById('ci-days').value) || 0;
+        var msgEl = document.getElementById('ci-msg');
+        msgEl.innerHTML = '<span style="color:rgba(255,255,255,0.4)">创建中...</span>';
+        try {
+          var r = await api('/settings/invite-codes', { method: 'POST', body: { alliance_name: allianceName, max_uses: maxUses, expires_days: days } });
+          msgEl.innerHTML = '<div style="padding:12px;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.2);border-radius:10px;text-align:center">'
+            + '<div style="color:#22C55E;font-size:0.85rem;margin-bottom:8px">✓ 邀请码创建成功</div>'
+            + '<code style="background:rgba(0,212,255,0.15);color:#00D4FF;padding:6px 16px;border-radius:8px;font-size:1.1rem;font-weight:700;letter-spacing:2px">' + esc(r.code) + '</code>'
+            + '<div style="font-size:0.7rem;color:rgba(255,255,255,0.4);margin-top:8px">点击复制按钮可复制到剪贴板</div>'
+            + '</div>';
+          document.getElementById('ci-submit').textContent = '✓ 已创建';
+          document.getElementById('ci-submit').disabled = true;
+          setTimeout(function() { modal.remove(); window._rootMgr.load(); }, 3000);
+        } catch(e) { msgEl.innerHTML = '<span style="color:#EF4444">' + esc(e.message) + '</span>'; }
+      };
+    },
+
+    deleteInvite: async function(id) {
+      if (!confirm('确认删除此邀请码？')) return;
+      try { await api('/settings/invite-codes/' + id, { method: 'DELETE' }); this.msg('已删除', true); await this.load(); } catch(e) { this.msg(e.message, false); }
+    }
+  };
+
+  var lastPath = '';
+  function checkRoute() {
+    var p = location.pathname;
+    if ((p === '/setting' || p === '/settings') && p !== lastPath) {
+      lastPath = p;
+      injected = false;
+      setTimeout(injectPanel, 500);
+      setTimeout(injectPanel, 1000);
+      setTimeout(injectPanel, 2000);
+    } else if (p !== '/setting' && p !== '/settings') {
+      lastPath = p;
+      injected = false;
+    }
+  }
+  setInterval(checkRoute, 500);
+})();
+</script>
+
+<script>
+// 使用教程链接 - 跳转引导页
+(function() {
+  function injectGuideLink() {
+    var sidebar = document.querySelector('aside');
+    if (!sidebar) return;
+    if (document.getElementById('guide-link-btn')) return;
+    var links = sidebar.querySelectorAll('a, button');
+    var tutorialLink = null;
+    links.forEach(function(el) {
+      if ((el.textContent || '').indexOf('使用教程') >= 0) tutorialLink = el;
+    });
+    if (!tutorialLink) return;
+    var guideBtn = document.createElement('a');
+    guideBtn.id = 'guide-link-btn';
+    guideBtn.href = '/guide.html';
+    guideBtn.textContent = '📖 新手引导';
+    guideBtn.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;font-size:0.82rem;color:rgba(255,255,255,0.6);text-decoration:none;transition:all 0.2s;cursor:pointer;margin-top:2px';
+    guideBtn.onmouseover = function(){ this.style.background='rgba(0,212,255,0.08)'; this.style.color='#00D4FF'; };
+    guideBtn.onmouseout = function(){ this.style.background=''; this.style.color='rgba(255,255,255,0.6)'; };
+    tutorialLink.parentNode.insertBefore(guideBtn, tutorialLink.nextSibling);
+  }
+  new MutationObserver(injectGuideLink).observe(document.getElementById('root'), {childList:true, subtree:true});
+  setInterval(injectGuideLink, 500);
+})();
+</script>

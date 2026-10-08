@@ -1,0 +1,406 @@
+/* ============================================
+   率土之滨军功系统 - 拟态玻璃科技主题
+   覆盖默认样式，通过 !important 提升优先级
+   ============================================ */
+
+/* === 颜色变量重写 === */
+:root {
+  --primary: #0a1929 !important;
+  --accent: #00d4ff !important;
+  --canvas: #0a0e1a !important;
+  --ink: #e2e8f0 !important;
+  --body: #94a3b8 !important;
+  --muted: #64748b !important;
+  --success: #00ff88 !important;
+  --danger: #ff4466 !important;
+  --warn: #ffaa00 !important;
+  --glass-bg: rgba(15, 23, 42, 0.6) !important;
+  --glass-border: rgba(0, 212, 255, 0.15) !important;
+  --glass-blur: 20px !important;
+  --glow-cyan: 0 0 20px rgba(0, 212, 255, 0.3) !important;
+  --glow-blue: 0 0 20px rgba(37, 99, 235, 0.3) !important;
+}
+
+/* === 全局背景 === */
+body {
+  background: linear-gradient(135deg, #0a0e1a 0%, #0d1b2a 30%, #1b2838 60%, #0a0e1a 100%) !important;
+  background-attachment: fixed !important;
+  color: #94a3b8 !important;
+}
+
+/* 动态网格背景 */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background:
+    linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+/* === 滚动条 === */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #00d4ff, #2563eb) !important;
+  border-radius: 3px !important;
+}
+::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.5) !important; }
+
+/* === 玻璃卡片 === */
+.card {
+  background: rgba(15, 23, 42, 0.5) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(0, 212, 255, 0.12) !important;
+  border-radius: 12px !important;
+  box-shadow:
+    0 4px 30px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+  transition: all 0.3s ease !important;
+  color: #e2e8f0 !important;
+}
+.card:hover {
+  border-color: rgba(0, 212, 255, 0.3) !important;
+  box-shadow:
+    0 4px 30px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(0, 212, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+/* === 统计卡片 === */
+.metric {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.08), rgba(37, 99, 235, 0.08)) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(0, 212, 255, 0.2) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.05) !important;
+  position: relative;
+  overflow: hidden;
+}
+.metric::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #00d4ff, transparent);
+  opacity: 0.6;
+}
+.metric .value {
+  color: #00d4ff !important;
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.5) !important;
+  font-size: 1.8rem !important;
+}
+.metric .label {
+  color: #64748b !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* === 按钮 === */
+.btn-primary {
+  background: linear-gradient(135deg, #0066ff, #00d4ff) !important;
+  border: none !important;
+  color: #fff !important;
+  border-radius: 8px !important;
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.3) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  font-weight: 600 !important;
+}
+.btn-primary:hover {
+  box-shadow: 0 0 25px rgba(0, 212, 255, 0.5) !important;
+  filter: brightness(1.15) !important;
+}
+
+.btn-secondary {
+  background: rgba(15, 23, 42, 0.6) !important;
+  border: 1px solid rgba(0, 212, 255, 0.25) !important;
+  color: #00d4ff !important;
+  backdrop-filter: blur(10px) !important;
+  border-radius: 8px !important;
+}
+.btn-secondary:hover {
+  background: rgba(0, 212, 255, 0.1) !important;
+  border-color: rgba(0, 212, 255, 0.5) !important;
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.2) !important;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #dc2626, #ff4466) !important;
+  box-shadow: 0 0 15px rgba(255, 68, 102, 0.3) !important;
+}
+.btn-success {
+  background: linear-gradient(135deg, #059669, #00ff88) !important;
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.3) !important;
+}
+.btn-warn {
+  background: linear-gradient(135deg, #d97706, #ffaa00) !important;
+  box-shadow: 0 0 15px rgba(255, 170, 0, 0.3) !important;
+}
+.btn-ghost {
+  color: #94a3b8 !important;
+  border-radius: 8px !important;
+}
+.btn-ghost:hover {
+  background: rgba(0, 212, 255, 0.08) !important;
+  color: #00d4ff !important;
+}
+
+/* === 输入框 === */
+.input, .select, .textarea {
+  background: rgba(15, 23, 42, 0.7) !important;
+  border: 1px solid rgba(0, 212, 255, 0.15) !important;
+  color: #e2e8f0 !important;
+  border-radius: 8px !important;
+  backdrop-filter: blur(10px) !important;
+  transition: all 0.3s ease !important;
+}
+.input:focus, .select:focus, .textarea:focus {
+  border-color: #00d4ff !important;
+  box-shadow: 0 0 12px rgba(0, 212, 255, 0.25) !important;
+  outline: none !important;
+}
+.input::placeholder, .textarea::placeholder {
+  color: #475569 !important;
+}
+
+/* === 表格 === */
+.table-wrap {
+  background: rgba(15, 23, 42, 0.5) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(0, 212, 255, 0.12) !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+table.data th {
+  background: rgba(0, 212, 255, 0.08) !important;
+  color: #00d4ff !important;
+  border-color: rgba(0, 212, 255, 0.1) !important;
+  text-transform: uppercase;
+  font-size: 0.7rem !important;
+  letter-spacing: 0.05em;
+}
+table.data td {
+  color: #cbd5e1 !important;
+  border-color: rgba(255, 255, 255, 0.04) !important;
+}
+table.data tr:hover td {
+  background: rgba(0, 212, 255, 0.05) !important;
+}
+
+/* === 侧边栏 === */
+.sidebar-link {
+  color: #94a3b8 !important;
+  border-radius: 8px !important;
+  margin-bottom: 2px !important;
+  transition: all 0.2s ease !important;
+}
+.sidebar-link:hover {
+  background: rgba(0, 212, 255, 0.08) !important;
+  color: #e2e8f0 !important;
+}
+.sidebar-link.active {
+  background: linear-gradient(135deg, rgba(0, 102, 255, 0.6), rgba(0, 212, 255, 0.4)) !important;
+  color: #fff !important;
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.2) !important;
+  border: 1px solid rgba(0, 212, 255, 0.3) !important;
+}
+
+/* === 标签 === */
+.tag-blue {
+  background: rgba(0, 212, 255, 0.15) !important;
+  color: #00d4ff !important;
+  border: 1px solid rgba(0, 212, 255, 0.25) !important;
+}
+.tag-green {
+  background: rgba(0, 255, 136, 0.1) !important;
+  color: #00ff88 !important;
+  border: 1px solid rgba(0, 255, 136, 0.2) !important;
+}
+.tag-orange {
+  background: rgba(255, 170, 0, 0.1) !important;
+  color: #ffaa00 !important;
+  border: 1px solid rgba(255, 170, 0, 0.2) !important;
+}
+.tag-red {
+  background: rgba(255, 68, 102, 0.1) !important;
+  color: #ff4466 !important;
+  border: 1px solid rgba(255, 68, 102, 0.2) !important;
+}
+.tag-purple {
+  background: rgba(139, 92, 246, 0.1) !important;
+  color: #a78bfa !important;
+  border: 1px solid rgba(139, 92, 246, 0.2) !important;
+}
+.tag-gray {
+  background: rgba(100, 116, 139, 0.15) !important;
+  color: #94a3b8 !important;
+  border: 1px solid rgba(100, 116, 139, 0.2) !important;
+}
+
+/* === 模态框 === */
+.modal-mask {
+  background: rgba(0, 0, 0, 0.7) !important;
+  backdrop-filter: blur(8px) !important;
+}
+.modal {
+  background: rgba(15, 23, 42, 0.85) !important;
+  backdrop-filter: blur(30px) !important;
+  border: 1px solid rgba(0, 212, 255, 0.2) !important;
+  border-radius: 16px !important;
+  box-shadow:
+    0 25px 50px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(0, 212, 255, 0.1) !important;
+  color: #e2e8f0 !important;
+}
+
+/* === 文字颜色 === */
+.text-ink { color: #e2e8f0 !important; }
+.text-body { color: #94a3b8 !important; }
+.text-muted { color: #64748b !important; }
+.text-primary { color: #00d4ff !important; }
+.text-accent { color: #00d4ff !important; }
+.text-success { color: #00ff88 !important; }
+.text-danger { color: #ff4466 !important; }
+.text-warn { color: #ffaa00 !important; }
+
+/* === 标签文字 === */
+.label {
+  color: #94a3b8 !important;
+  text-transform: uppercase;
+  font-size: 0.68rem !important;
+  letter-spacing: 0.05em;
+}
+
+/* === 空状态 === */
+.empty {
+  color: #475569 !important;
+}
+
+/* === 表单选项 === */
+.select option {
+  background: #0f172a !important;
+  color: #e2e8f0 !important;
+}
+
+/* === 通用hover效果 === */
+.hover\:bg-slate-100:hover,
+.hover\:bg-slate-50:hover {
+  background: rgba(0, 212, 255, 0.05) !important;
+}
+.hover\:text-ink:hover {
+  color: #00d4ff !important;
+}
+.hover\:border-slate-200:hover,
+.hover\:border-blue-300:hover,
+.hover\:border-blue-400:hover {
+  border-color: rgba(0, 212, 255, 0.3) !important;
+}
+
+/* === 背景色覆盖 === */
+.bg-canvas { background: transparent !important; }
+.bg-white { background: rgba(15, 23, 42, 0.5) !important; }
+.bg-slate-50 { background: rgba(15, 23, 42, 0.3) !important; }
+.bg-slate-100 { background: rgba(0, 212, 255, 0.05) !important; }
+.bg-blue-50, .bg-blue-50\/40, .bg-blue-50\/50 {
+  background: rgba(0, 212, 255, 0.06) !important;
+}
+.bg-emerald-50 { background: rgba(0, 255, 136, 0.06) !important; }
+.bg-red-50, .bg-red-50\/40 { background: rgba(255, 68, 102, 0.06) !important; }
+.bg-orange-50 { background: rgba(255, 170, 0, 0.06) !important; }
+
+/* === 边框颜色 === */
+.border-slate-100, .border-slate-200, .border-slate-300,
+.border { border-color: rgba(0, 212, 255, 0.1) !important; }
+
+/* === 首页加载动画增强 === */
+@keyframes techPulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(0.95);
+    filter: hue-rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+    filter: hue-rotate(30deg);
+  }
+}
+
+#root:empty::after {
+  color: #00d4ff !important;
+  animation: techPulse 1.5s ease-in-out infinite !important;
+  text-shadow: 0 0 30px rgba(0, 212, 255, 0.6) !important;
+}
+
+/* === 全局过渡 === */
+.card, .btn-primary, .btn-secondary, .btn-ghost,
+.input, .select, .sidebar-link, .tag,
+.metric, .table-wrap, .modal {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* === 侧边栏背景（覆盖 bg-primary）=== */
+.bg-primary {
+  background: linear-gradient(180deg, rgba(10, 25, 41, 0.95), rgba(6, 15, 30, 0.98)) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-right: 1px solid rgba(0, 212, 255, 0.08) !important;
+}
+
+/* === 顶栏背景（覆盖 bg-gradient from-primary to-blue-800）=== */
+.bg-gradient-to-r.from-primary {
+  background: linear-gradient(to right, rgba(10, 25, 41, 0.9), rgba(15, 30, 50, 0.9)) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border-bottom: 1px solid rgba(0, 212, 255, 0.1) !important;
+}
+
+/* === 顶栏文字颜色 === */
+.bg-primary .text-white,
+.bg-primary .text-white\/80 {
+  color: #e2e8f0 !important;
+}
+
+/* === 侧边栏分组标题 === */
+.bg-primary .text-slate-300,
+.bg-primary .text-slate-400 {
+  color: #64748b !important;
+}
+
+/* === 侧边栏底部用户信息 === */
+.bg-primary .border-white\/10 {
+  border-color: rgba(0, 212, 255, 0.1) !important;
+}
+
+/* === 登录页背景 === */
+.min-h-screen.bg-primary {
+  background: linear-gradient(rgba(10,14,26,0.5), rgba(10,14,26,0.7)),
+              url('/assets/login-bg.png') center center / cover no-repeat !important;
+}
+
+/* === 登录页背景图（最高优先级） === */
+div.min-h-screen.bg-primary {
+  background: linear-gradient(rgba(10,14,26,0.45), rgba(10,14,26,0.65)),
+              url('/assets/login-bg.png') center / cover no-repeat !important;
+  backdrop-filter: none !important;
+}
+
+/* === 修复页面滚动 === */
+main.flex-1 {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+/* === 强制修复所有页面滚动 === */
+html, body { overflow: auto !important; height: auto !important; }
+#root { height: auto !important; overflow: visible !important; }
+div.flex { height: auto !important; min-height: calc(100vh - 3.5rem); }
+main.flex-1 { overflow: visible !important; min-height: calc(100vh - 3.5rem); }

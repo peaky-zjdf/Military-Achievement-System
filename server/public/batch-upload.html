@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>批量截图识别 | 率土之滨军功系统</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0e1a;--card:rgba(15,23,42,0.6);--border:rgba(0,212,255,0.12);--accent:#00d4ff;--accent2:#2563eb;--text:#e2e8f0;--muted:#64748b;--success:#00ff88;--danger:#ff4466;--warn:#ffaa00;--glass:blur(20px)}
+body{background:linear-gradient(135deg,#0a0e1a,#0d1b2a,#1b2838,#0a0e1a);background-attachment:fixed;color:var(--text);font-family:Inter,system-ui,-apple-system,'Microsoft YaHei',sans-serif;min-height:100vh;padding:16px}
+body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(rgba(0,212,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.02) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+.container{max-width:900px;margin:0 auto;position:relative;z-index:1}
+h1{font-size:1.4rem;margin-bottom:4px;background:linear-gradient(90deg,#fff,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sub{color:var(--muted);font-size:0.8rem;margin-bottom:20px}
+.card{background:var(--card);backdrop-filter:var(--glass);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}
+.upload-zone{border:2px dashed rgba(0,212,255,0.25);border-radius:12px;padding:40px;text-align:center;cursor:pointer;transition:all 0.3s}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:rgba(0,212,255,0.05)}
+.upload-zone input{display:none}
+.upload-zone .icon{font-size:2.5rem;margin-bottom:8px}
+.upload-zone p{color:var(--muted);font-size:0.85rem}
+.upload-zone .hint{font-size:0.75rem;color:#475569;margin-top:6px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:8px;font-size:0.85rem;font-weight:500;cursor:pointer;border:none;transition:all 0.25s}
+.btn:disabled{opacity:0.4;cursor:not-allowed}
+.btn-primary{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;box-shadow:0 0 15px rgba(0,212,255,0.2)}
+.btn-primary:hover:not(:disabled){box-shadow:0 0 25px rgba(0,212,255,0.4)}
+.btn-secondary{background:rgba(15,23,42,0.6);border:1px solid rgba(0,212,255,0.2);color:var(--accent)}
+.btn-secondary:hover:not(:disabled){background:rgba(0,212,255,0.1)}
+.btn-success{background:linear-gradient(135deg,#059669,var(--success));color:#fff}
+.btn-danger{background:linear-gradient(135deg,#dc2626,var(--danger));color:#fff}
+.btn-sm{padding:5px 12px;font-size:0.75rem}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0}
+.progress{height:4px;background:rgba(0,212,255,0.1);border-radius:2px;overflow:hidden;margin:12px 0}
+.progress-inner{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:2px;transition:width 0.3s}
+.stats{display:flex;gap:16px;flex-wrap:wrap;margin:12px 0}
+.stat{display:flex;align-items:center;gap:6px;font-size:0.85rem}
+.stat .dot{width:8px;height:8px;border-radius:50%}
+.dot-green{background:var(--success)}
+.dot-red{background:var(--danger)}
+.dot-blue{background:var(--accent)}
+.dot-yellow{background:var(--warn)}
+.result-item{display:flex;gap:14px;padding:14px;border:1px solid var(--border);border-radius:10px;margin-bottom:10px;transition:all 0.25s}
+.result-item:hover{border-color:rgba(0,212,255,0.3)}
+.result-item.matched{border-left:3px solid var(--success)}
+.result-item.unmatched{border-left:3px solid var(--danger)}
+.result-item.error{border-left:3px solid var(--warn);opacity:0.7}
+.result-thumb{width:80px;height:80px;border-radius:8px;object-fit:cover;background:rgba(0,0,0,0.3);flex-shrink:0}
+.result-info{flex:1;min-width:0}
+.result-info h3{font-size:0.9rem;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:12px;font-size:0.7rem;font-weight:500}
+.tag-green{background:rgba(0,255,136,0.1);color:var(--success);border:1px solid rgba(0,255,136,0.2)}
+.tag-red{background:rgba(255,68,102,0.1);color:var(--danger);border:1px solid rgba(255,68,102,0.2)}
+.tag-blue{background:rgba(0,212,255,0.1);color:var(--accent);border:1px solid rgba(0,212,255,0.2)}
+.tag-gray{background:rgba(100,116,139,0.15);color:#94a3b8;border:1px solid rgba(100,116,139,0.2)}
+.tag-yellow{background:rgba(255,170,0,0.1);color:var(--warn);border:1px solid rgba(255,170,0,0.2)}
+.detail{font-size:0.78rem;color:var(--muted);margin-top:4px;line-height:1.5}
+.detail b{color:var(--text);font-weight:500}
+select.member-select{background:rgba(15,23,42,0.7);border:1px solid rgba(0,212,255,0.2);color:var(--text);padding:4px 8px;border-radius:6px;font-size:0.8rem;max-width:200px}
+select.member-select:focus{border-color:var(--accent);outline:none;box-shadow:0 0 8px rgba(0,212,255,0.2)}
+.toast{position:fixed;top:20px;right:20px;padding:12px 20px;border-radius:10px;font-size:0.85rem;z-index:9999;animation:slideIn 0.3s ease;backdrop-filter:var(--glass)}
+.toast-success{background:rgba(0,255,136,0.15);border:1px solid rgba(0,255,136,0.3);color:var(--success)}
+.toast-error{background:rgba(255,68,102,0.15);border:1px solid rgba(255,68,102,0.3);color:var(--danger)}
+.toast-info{background:rgba(0,212,255,0.15);border:1px solid rgba(0,212,255,0.3);color:var(--accent)}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(0,212,255,0.3);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite}
+.hidden{display:none!important}
+.back-link{display:inline-flex;align-items:center;gap:4px;color:var(--muted);font-size:0.8rem;text-decoration:none;margin-bottom:16px}
+.back-link:hover{color:var(--accent)}
+.generals-mini{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.general-chip{background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.12);padding:2px 8px;border-radius:6px;font-size:0.72rem}
+</style>
+</head>
+<body>
+<div class="container">
+  <a href="/" class="back-link">← 返回系统</a>
+  <h1>⚔ 批量截图识别</h1>
+  <p class="sub">上传多张战报/阵容/统计截图，自动识别并匹配成员入库</p>
+
+  <!-- 上传区 -->
+  <div class="card" id="upload-card">
+    <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+      <div class="icon">📸</div>
+      <p>点击或拖拽上传截图</p>
+      <p class="hint">支持：战报、部队阵容、武将统计、战法统计 · 最多20张</p>
+      <input type="file" id="file-input" multiple accept="image/*">
+    </div>
+    <div class="bar" id="preview-bar"></div>
+    <div class="bar" style="justify-content:flex-end">
+      <button class="btn btn-primary" id="btn-upload" disabled onclick="startUpload()">
+        <span id="upload-icon">🔍</span>
+        <span id="upload-text">开始识别</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 进度 -->
+  <div class="card hidden" id="progress-card">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+      <span class="spinner"></span>
+      <span id="progress-label">识别中...</span>
+    </div>
+    <div class="progress"><div class="progress-inner" id="progress-bar" style="width:0%"></div></div>
+  </div>
+
+  <!-- 结果 -->
+  <div class="hidden" id="results-section">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <div class="stats" id="result-stats"></div>
+        <div class="bar" style="margin:0">
+          <button class="btn btn-secondary btn-sm" onclick="selectAll()">全选</button>
+          <button class="btn btn-secondary btn-sm" onclick="deselectAll()">取消全选</button>
+          <button class="btn btn-success" id="btn-confirm" onclick="batchConfirm()">
+            ✓ 批量保存 (<span id="confirm-count">0</span>)
+          </button>
+        </div>
+      </div>
+    </div>
+    <div id="results-list"></div>
+  </div>
+</div>
+
+<script>
+const API = '';
+let token = '';
+let members = [];
+let results = [];
+
+// 登录
+async function login() {
+  const saved = localStorage.getItem('shitabing_token');
+  if (saved) { token = saved; return true; }
+  const username = prompt('请输入用户名');
+  const password = prompt('请输入密码');
+  if (!username || !password) return false;
+  try {
+    const r = await fetch(API + '/api/auth/login', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({username, password})
+    });
+    const d = await r.json();
+    if (d.token) { token = d.token; localStorage.setItem('shitabing_token', token); return true; }
+    alert(d.error || '登录失败');
+  } catch(e) { alert('网络错误'); }
+  return false;
+}
+
+async function api(path, opts = {}) {
+  const r = await fetch(API + '/api' + path, {
+    ...opts,
+    headers: { 'Authorization': 'Bearer ' + token, ...(opts.headers || {}) }
+  });
+  if (r.status === 401) { localStorage.removeItem('shitabing_token'); location.reload(); }
+  return r;
+}
+
+// 加载成员列表
+async function loadMembers() {
+  const r = await api('/members');
+  members = await r.json();
+  if (Array.isArray(members)) return;
+  // 分页格式兼容
+  if (members.data) members = members.data;
+}
+
+// 拖拽上传
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('file-input');
+const previewBar = document.getElementById('preview-bar');
+let selectedFiles = [];
+
+['dragenter','dragover'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.add('drag'); }));
+['dragleave','drop'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.remove('drag'); }));
+dropZone.addEventListener('drop', ev => { addFiles(ev.dataTransfer.files); });
+fileInput.addEventListener('change', () => { addFiles(fileInput.files); fileInput.value = ''; });
+
+function addFiles(fileList) {
+  for (const f of fileList) {
+    if (f.type.startsWith('image/') && selectedFiles.length < 20) {
+      selectedFiles.push(f);
+    }
+  }
+  renderPreview();
+}
+
+function renderPreview() {
+  previewBar.innerHTML = '';
+  selectedFiles.forEach((f, i) => {
+    const div = document.createElement('div');
+    div.style.cssText = 'position:relative;display:inline-block';
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(f);
+    img.style.cssText = 'width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border)';
+    const btn = document.createElement('button');
+    btn.textContent = '×';
+    btn.style.cssText = 'position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:var(--danger);color:#fff;border:none;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center';
+    btn.onclick = () => { selectedFiles.splice(i, 1); renderPreview(); };
+    div.appendChild(img);
+    div.appendChild(btn);
+    previewBar.appendChild(div);
+  });
+  document.getElementById('btn-upload').disabled = selectedFiles.length === 0;
+  document.getElementById('upload-text').textContent = selectedFiles.length ? `开始识别 (${selectedFiles.length}张)` : '开始识别';
+}
+
+// 上传识别
+async function startUpload() {
+  if (!selectedFiles.length) return;
+  if (!token && !(await login())) return;
+
+  const progressCard = document.getElementById('progress-card');
+  const progressBar = document.getElementById('progress-bar');
+  const progressLabel = document.getElementById('progress-label');
+  const resultsSection = document.getElementById('results-section');
+
+  progressCard.classList.remove('hidden');
+  resultsSection.classList.add('hidden');
+  progressBar.style.width = '10%';
+  progressLabel.textContent = `正在上传并识别 ${selectedFiles.length} 张截图...`;
+
+  const formData = new FormData();
+  selectedFiles.forEach(f => formData.append('images', f));
+
+  document.getElementById('btn-upload').disabled = true;
+
+  try {
+    progressBar.style.width = '30%';
+    const r = await api('/reportshot/parse-multi', { method: 'POST', body: formData });
+    progressBar.style.width = '90%';
+    const data = await r.json();
+
+    if (!r.ok) { showToast(data.error || '识别失败', 'error'); return; }
+
+    results = data.results || [];
+    progressBar.style.width = '100%';
+    progressLabel.textContent = `识别完成 · 匹配${data.matched} · 未匹配${data.unmatched}`;
+
+    renderResults();
+    resultsSection.classList.remove('hidden');
+    showToast(`识别完成：${data.count}张，匹配${data.matched}张`, 'success');
+  } catch(e) {
+    showToast('请求失败：' + e.message, 'error');
+  } finally {
+    document.getElementById('btn-upload').disabled = false;
+  }
+}
+
+// 渲染结果
+function renderResults() {
+  const stats = document.getElementById('result-stats');
+  const list = document.getElementById('results-list');
+  const matched = results.filter(r => r.matched).length;
+  const unmatched = results.filter(r => r.ok && !r.matched).length;
+  const errors = results.filter(r => !r.ok).length;
+
+  stats.innerHTML = `
+    <span class="stat"><span class="dot dot-blue"></span>共 ${results.length}</span>
+    <span class="stat"><span class="dot dot-green"></span>匹配 ${matched}</span>
+    <span class="stat"><span class="dot dot-red"></span>未匹配 ${unmatched}</span>
+    ${errors ? `<span class="stat"><span class="dot dot-yellow"></span>失败 ${errors}</span>` : ''}
+  `;
+
+  list.innerHTML = '';
+  results.forEach((r, i) => {
+    const div = document.createElement('div');
+    const cls = !r.ok ? 'error' : r.matched ? 'matched' : 'unmatched';
+    div.className = `result-item ${cls}`;
+    div.dataset.index = i;
+
+    const thumb = r.file ? `<img class="result-thumb" src="${API}${r.file}" alt="">` : `<div class="result-thumb" style="display:flex;align-items:center;justify-content:center;color:var(--muted)">?</div>`;
+
+    const typeTag = `<span class="tag tag-blue">${r.page_type || '未知'}</span>`;
+    const matchTag = r.matched
+      ? `<span class="tag tag-green">✓ ${r.member.nickname}</span>`
+      : (!r.ok ? `<span class="tag tag-yellow">识别失败</span>` : `<span class="tag tag-red">✗ 未匹配</span>`);
+
+    let detail = '';
+    if (r.battle) {
+      detail = `<b>${r.battle.result || '?'}</b> 武勋${r.battle.war_merit || 0} · ${r.battle.our?.player || ''} vs ${r.battle.enemy?.player || ''}`;
+      const gens = r.battle.our?.generals || [];
+      if (gens.length) {
+        detail += `<div class="generals-mini">${gens.map(g => `<span class="general-chip">${g.name} Lv${g.level}</span>`).join('')}</div>`;
+      }
+    } else if (r.rows?.length) {
+      detail = `${r.rows.length}行数据 · ${r.rows.map(r => r.name).filter(Boolean).join('、')}`;
+    } else if (r.nickname) {
+      detail = `识别名称: ${r.nickname}`;
+    }
+
+    // 成员选择
+    let memberSelect = '';
+    if (r.ok) {
+      if (r.matched) {
+        memberSelect = `<select class="member-select" data-idx="${i}" onchange="updateMember(${i}, this.value)">
+          <option value="${r.member.id}" selected>${r.member.nickname}</option>
+          ${memberOptions(r.member.id)}
+        </select>`;
+      } else {
+        memberSelect = `<select class="member-select" data-idx="${i}" onchange="updateMember(${i}, this.value)">
+          <option value="">-- 请选择成员 --</option>
+          ${memberOptions()}
+        </select>`;
+      }
+    }
+
+    // 选中框
+    const checkbox = r.ok ? `<input type="checkbox" ${r.matched ? 'checked' : ''} data-idx="${i}" onchange="updateConfirmCount()" style="accent-color:var(--accent)">` : '';
+
+    div.innerHTML = `
+      ${thumb}
+      <div class="result-info">
+        <h3>${checkbox} 截图${i+1} ${typeTag} ${matchTag}</h3>
+        <div class="detail">${detail || r.error || ''}</div>
+        <div style="margin-top:6px;display:flex;align-items:center;gap:8px">
+          <span style="font-size:0.75rem;color:var(--muted)">绑定成员:</span>
+          ${memberSelect}
+        </div>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+  updateConfirmCount();
+}
+
+function memberOptions(selectedId) {
+  return members.map(m =>
+    `<option value="${m.id}" ${m.id == selectedId ? 'selected' : ''}>${m.nickname} (${m.game_id})</option>`
+  ).join('');
+}
+
+function updateMember(idx, value) {
+  if (value) {
+    const m = members.find(m => m.id == value);
+    if (m) {
+      results[idx].member = { id: m.id, nickname: m.nickname, game_id: m.game_id };
+      results[idx].matched = true;
+    }
+  } else {
+    results[idx].member = null;
+    results[idx].matched = false;
+  }
+  // 更新 checkbox
+  const cb = document.querySelector(`input[data-idx="${idx}"]`);
+  if (cb) cb.checked = results[idx].matched;
+  updateConfirmCount();
+}
+
+function updateConfirmCount() {
+  const checked = document.querySelectorAll('input[type=checkbox]:checked');
+  document.getElementById('confirm-count').textContent = checked.length;
+}
+
+function selectAll() {
+  document.querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = true);
+  updateConfirmCount();
+}
+function deselectAll() {
+  document.querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = false);
+  updateConfirmCount();
+}
+
+// 批量确认
+async function batchConfirm() {
+  const checked = document.querySelectorAll('input[type=checkbox]:checked');
+  if (!checked.length) { showToast('请至少选择一项', 'error'); return; }
+
+  const items = [];
+  for (const cb of checked) {
+    const idx = parseInt(cb.dataset.idx);
+    const r = results[idx];
+    const memberId = document.querySelector(`select[data-idx="${idx}"]`)?.value;
+    if (!memberId) { showToast(`截图${idx+1} 未选择成员`, 'error'); return; }
+    items.push({
+      filename: r.filename,
+      file: r.file,
+      member_id: parseInt(memberId),
+      kind: r.kind,
+      page_type: r.page_type,
+      side: r.side || '',
+      nickname: r.nickname || '',
+      alliance: r.battle?.our?.alliance || r.battle?.enemy?.alliance || '',
+      generals: r.generals || (r.battle?.our?.generals || []).concat(r.battle?.enemy?.generals || []),
+      rows: r.rows || [],
+      title: r.page_type || '',
+      raw: r.raw || '',
+      note: '',
+    });
+  }
+
+  document.getElementById('btn-confirm').disabled = true;
+  try {
+    const r = await api('/reportshot/batch-confirm', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items })
+    });
+    const data = await r.json();
+    if (r.ok) {
+      showToast(`保存成功：${data.okCount}/${items.length}条`, 'success');
+      // 标记已保存
+      for (const cb of checked) {
+        const idx = parseInt(cb.dataset.idx);
+        const item = results[idx];
+        const res = data.results.find(r => r.filename === item.filename);
+        if (res?.ok) {
+          cb.closest('.result-item').style.opacity = '0.5';
+          cb.disabled = true;
+          cb.checked = false;
+        }
+      }
+    } else {
+      showToast(data.error || '保存失败', 'error');
+    }
+  } catch(e) {
+    showToast('请求失败：' + e.message, 'error');
+  } finally {
+    document.getElementById('btn-confirm').disabled = false;
+    updateConfirmCount();
+  }
+}
+
+// Toast
+function showToast(msg, type = 'info') {
+  const div = document.createElement('div');
+  div.className = `toast toast-${type}`;
+  div.textContent = msg;
+  document.body.appendChild(div);
+  setTimeout(() => div.remove(), 3500);
+}
+
+// 初始化
+(async () => {
+  if (await login()) {
+    await loadMembers();
+    showToast('已登录，成员列表已加载', 'info');
+  }
+})();
+</script>
+</body>
+</html>

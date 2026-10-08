@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>视频测试</title></head>
+<body style="margin:0;background:#000">
+<video id="v" autoplay muted controls playsinline style="width:100vw;height:100vh;object-fit:contain;background:#000">
+  <source src="/assets/splash.mp4" type="video/mp4">
+</video>
+<script>
+var v = document.getElementById('v');
+v.addEventListener('play', function() { console.log('PLAY'); });
+v.addEventListener('playing', function() { console.log('PLAYING'); });
+v.addEventListener('error', function(e) { console.log('ERROR', v.error); });
+v.addEventListener('loadeddata', function() { console.log('LOADED', v.videoWidth+'x'+v.videoHeight); });
+v.addEventListener('canplay', function() { console.log('CANPLAY'); });
+setTimeout(function() { console.log('STATUS readyState='+v.readyState+' currentTime='+v.currentTime+' paused='+v.paused+' ended='+v.ended); }, 2000);
+</script>
+</body></html>

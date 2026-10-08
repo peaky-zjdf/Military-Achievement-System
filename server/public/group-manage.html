@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>团管理 - 率土之滨军功系统</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Microsoft YaHei',sans-serif;background:linear-gradient(160deg,#0a0f1e 0%,#0d1326 50%,#0a0a1a 100%);color:#F8FAFC;min-height:100vh;line-height:1.6}
+  .container{max-width:1200px;margin:0 auto;padding:20px}
+  .header{display:flex;align-items:center;gap:16px;margin-bottom:24px;padding:16px 20px;background:rgba(255,255,255,0.06);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.12);border-radius:14px}
+  .header h1{font-size:1.3rem;font-weight:700}
+  .header .desc{font-size:0.8rem;color:rgba(255,255,255,0.5)}
+  .btn{padding:8px 16px;border-radius:10px;border:none;cursor:pointer;font-size:0.8rem;font-weight:500;transition:all 0.2s}
+  .btn-primary{background:linear-gradient(135deg,#00D4FF,#0088CC);color:#000;box-shadow:0 2px 12px rgba(0,212,255,0.2)}
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,212,255,0.35)}
+  .btn-secondary{background:rgba(255,255,255,0.08);color:#F8FAFC;border:1px solid rgba(255,255,255,0.12)}
+  .btn-secondary:hover{background:rgba(255,255,255,0.15)}
+  .btn-danger{background:rgba(239,68,68,0.8);color:#fff}
+  .btn-sm{padding:5px 12px;font-size:0.75rem;border-radius:8px}
+  .btn-success{background:rgba(34,197,94,0.8);color:#000}
+  .grid{display:grid;gap:16px}
+  .grid-2{grid-template-columns:1fr 1fr}
+  .grid-3{grid-template-columns:1fr 1fr 1fr}
+  @media(max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr}}
+  .card{background:rgba(255,255,255,0.06);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:20px;transition:all 0.25s}
+  .card:hover{border-color:rgba(255,255,255,0.2);box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+  .card-title{font-size:1rem;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+  .card-meta{font-size:0.75rem;color:rgba(255,255,255,0.45);margin-bottom:12px}
+  .card-desc{font-size:0.8rem;color:rgba(255,255,255,0.6);margin-bottom:12px}
+  .tag{display:inline-flex;padding:2px 8px;border-radius:16px;font-size:0.7rem;font-weight:500}
+  .tag-green{background:rgba(34,197,94,0.15);color:#22C55E;border:1px solid rgba(34,197,94,0.25)}
+  .tag-blue{background:rgba(59,130,246,0.15);color:#3B82F6;border:1px solid rgba(59,130,246,0.25)}
+  .tag-orange{background:rgba(245,158,11,0.15);color:#F59E0B;border:1px solid rgba(245,158,11,0.25)}
+  .tag-gray{background:rgba(100,116,139,0.15);color:#94A3B8;border:1px solid rgba(100,116,139,0.25)}
+  .member-list{max-height:300px;overflow-y:auto;margin-top:8px}
+  .member-item{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-radius:8px;font-size:0.8rem;transition:background 0.15s}
+  .member-item:hover{background:rgba(255,255,255,0.06)}
+  .member-item .name{font-weight:500}
+  .member-item .stats{color:rgba(255,255,255,0.45);font-size:0.7rem}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .badge{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:10px;font-size:0.7rem;font-weight:600;background:rgba(0,212,255,0.2);color:#00D4FF}
+  input,select,textarea{background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#F8FAFC;padding:10px 14px;font-size:0.85rem;width:100%;transition:all 0.2s;font-family:inherit}
+  input:focus,select:focus,textarea:focus{border-color:#00D4FF;box-shadow:0 0 0 3px rgba(0,212,255,0.12);outline:none}
+  label{display:block;font-size:0.75rem;color:rgba(255,255,255,0.6);margin-bottom:4px;font-weight:500}
+  .field{margin-bottom:14px}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);z-index:100;display:flex;align-items:center;justify-content:center}
+  .modal{background:rgba(15,23,42,0.95);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.15);border-radius:16px;width:90%;max-width:520px;max-height:85vh;overflow:auto;box-shadow:0 32px 64px rgba(0,0,0,0.5)}
+  .modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.1)}
+  .modal-body{padding:20px}
+  .modal-footer{display:flex;justify-content:flex-end;gap:8px;padding:12px 20px;border-top:1px solid rgba(255,255,255,0.1)}
+  .msg{padding:8px 14px;border-radius:10px;font-size:0.8rem;margin-bottom:12px}
+  .msg-ok{background:rgba(34,197,94,0.12);color:#22C55E;border:1px solid rgba(34,197,94,0.2)}
+  .msg-err{background:rgba(239,68,68,0.12);color:#EF4444;border:1px solid rgba(239,68,68,0.2)}
+  .empty{text-align:center;padding:40px;color:rgba(255,255,255,0.35);font-size:0.85rem}
+  .progress{height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;margin-top:8px}
+  .progress-bar{height:100%;background:linear-gradient(90deg,#00D4FF,#22C55E);border-radius:2px;transition:width 0.3s}
+  .table-wrap{overflow-x:auto;border-radius:12px;border:1px solid rgba(255,255,255,0.08)}
+  table{width:100%;border-collapse:collapse;font-size:0.8rem}
+  th{background:rgba(0,128,255,0.06);color:rgba(255,255,255,0.6);font-weight:600;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;padding:10px 14px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.08)}
+  td{padding:8px 14px;border-bottom:1px solid rgba(255,255,255,0.04);color:#F8FAFC}
+  tr:hover td{background:rgba(255,255,255,0.03)}
+  .tab-bar{display:flex;gap:4px;padding:4px;background:rgba(30,41,59,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:10px;margin-bottom:16px;overflow-x:auto}
+  .tab{padding:8px 16px;border-radius:8px;font-size:0.8rem;cursor:pointer;transition:all 0.2s;color:rgba(255,255,255,0.5);white-space:nowrap}
+  .tab.active{background:rgba(0,212,255,0.15);color:#00D4FF;font-weight:500}
+  .tab:hover:not(.active){color:#F8FAFC;background:rgba(255,255,255,0.06)}
+  .flex{display:flex}.gap-2{gap:8px}.gap-3{gap:12px}.items-center{align-items:center}.justify-between{justify-content:space-between}.flex-1{flex:1}
+  .text-sm{font-size:0.8rem}.text-xs{font-size:0.7rem}.text-muted{color:rgba(255,255,255,0.45)}.font-bold{font-weight:700}
+  .mb-3{margin-bottom:12px}.mb-4{margin-bottom:16px}.mt-2{margin-top:8px}.mt-3{margin-top:12px}
+  .back-link{color:#00D4FF;text-decoration:none;font-size:0.8rem;display:inline-flex;align-items:center;gap:4px}
+  .back-link:hover{text-decoration:underline}
+  .stat-row{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px}
+  .stat-item{font-size:0.75rem;color:rgba(255,255,255,0.5)}
+  .stat-item b{color:#F8FAFC}
+  .ungrouped-section{margin-top:24px}
+  .checkbox-label{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.8rem}
+  .checkbox-label input[type=checkbox]{width:16px;height:16px;accent-color:#00D4FF}
+  .search-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+  .search-bar input{flex:1;min-width:200px}
+  .search-bar select{width:auto;min-width:120px}
+</style>
+</head>
+<body>
+<div class="container" id="app">
+  <div class="header">
+    <a href="/" class="back-link">← 返回系统</a>
+    <div class="flex-1">
+      <h1>⚔ 团管理</h1>
+      <div class="desc">管理同盟分组、团长任命、成员分配</div>
+    </div>
+    <button class="btn btn-primary" onclick="showCreateModal()">+ 新建团</button>
+  </div>
+  <div id="msg"></div>
+  <div class="tab-bar">
+    <div class="tab active" data-tab="groups" onclick="switchTab('groups')">团列表</div>
+    <div class="tab" data-tab="unassigned" onclick="switchTab('unassigned')">未分组成员</div>
+  </div>
+  <div id="tab-groups"></div>
+  <div id="tab-unassigned" style="display:none"></div>
+</div>
+
+<script>
+const API = '/api';
+let token = localStorage.getItem('shitabing_token') || '';
+let groups = [], members = [], allMembers = [];
+
+async function api(path, opts = {}) {
+  const { method = 'GET', body } = opts;
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers.Authorization = 'Bearer ' + token;
+  const resp = await fetch(API + path, { method, headers, body: body ? JSON.stringify(body) : undefined });
+  if (resp.status === 401) { location.href = '/'; return; }
+  const data = await resp.json();
+  if (!resp.ok) throw new Error(data.error || '请求失败');
+  return data;
+}
+
+function showMsg(text, ok = true) {
+  const el = document.getElementById('msg');
+  el.innerHTML = '<div class="msg ' + (ok ? 'msg-ok' : 'msg-err') + '">' + text + '</div>';
+  setTimeout(() => el.innerHTML = '', 3000);
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  document.getElementById('tab-groups').style.display = tab === 'groups' ? '' : 'none';
+  document.getElementById('tab-unassigned').style.display = tab === 'unassigned' ? '' : 'none';
+  if (tab === 'unassigned') renderUnassigned();
+}
+
+async function loadAll() {
+  [groups, allMembers] = await Promise.all([api('/members/groups'), api('/members')]);
+  renderGroups();
+}
+
+function renderGroups() {
+  const el = document.getElementById('tab-groups');
+  if (!groups.length) { el.innerHTML = '<div class="empty">暂无分团，点击「新建团」创建</div>'; return; }
+  el.innerHTML = '<div class="grid grid-3">' + groups.map(g => {
+    const leaderName = g.leader_name || '未任命';
+    const pct = g.member_count > 0 ? Math.min(100, g.member_count * 10) : 0;
+    return '<div class="card" id="group-' + g.id + '">'
+      + '<div class="flex justify-between items-center">'
+      + '  <div class="card-title">' + esc(g.name) + ' <span class="badge">' + g.member_count + '</span></div>'
+      + '  <div class="flex gap-2">'
+      + '    <button class="btn btn-secondary btn-sm" onclick="showEditModal(' + g.id + ')">编辑</button>'
+      + '    <button class="btn btn-danger btn-sm" onclick="deleteGroup(' + g.id + ')">删除</button>'
+      + '  </div>'
+      + '</div>'
+      + (g.description ? '<div class="card-desc">' + esc(g.description) + '</div>' : '')
+      + '<div class="stat-row">'
+      + '  <div class="stat-item">团长: <b>' + esc(leaderName) + '</b></div>'
+      + '  <div class="stat-item">成员: <b>' + g.member_count + '</b></div>'
+      + '</div>'
+      + '<div class="progress"><div class="progress-bar" style="width:' + pct + '%"></div></div>'
+      + '<div class="actions">'
+      + '  <button class="btn btn-secondary btn-sm" onclick="showMembers(' + g.id + ')">查看成员</button>'
+      + '  <button class="btn btn-success btn-sm" onclick="showAssignModal(' + g.id + ')">添加成员</button>'
+      + '</div>'
+      + '<div class="member-list" id="ml-' + g.id + '"></div>'
+      + '</div>';
+  }).join('') + '</div>';
+}
+
+async function showMembers(gid) {
+  const el = document.getElementById('ml-' + gid);
+  if (el.innerHTML) { el.innerHTML = ''; return; }
+  try {
+    const list = await api('/members/groups/' + gid + '/members');
+    if (!list.length) { el.innerHTML = '<div class="text-xs text-muted mt-2">暂无成员</div>'; return; }
+    el.innerHTML = list.map(m =>
+      '<div class="member-item">'
+      + '  <div><span class="name">' + esc(m.nickname) + '</span> <span class="text-xs text-muted">' + esc(m.game_id) + '</span></div>'
+      + '  <div class="flex gap-2 items-center">'
+      + '    <span class="tag ' + roleTag(m.role) + '">' + m.role + '</span>'
+      + '    <span class="stats">军功 ' + m.total_merit + '</span>'
+      + '    <button class="btn btn-secondary btn-sm" onclick="removeFromGroup(' + m.id + ',' + gid + ')">移出</button>'
+      + '  </div>'
+      + '</div>'
+    ).join('');
+  } catch (e) { showMsg(e.message, false); }
+}
+
+function roleTag(r) {
+  return r === '盟主' ? 'tag-orange' : r === '副盟' ? 'tag-blue' : r === '团长' ? 'tag-green' : 'tag-gray';
+}
+
+async function removeFromGroup(mid, gid) {
+  if (!confirm('确认将该成员移出此团？')) return;
+  try {
+    await api('/members/' + mid, { method: 'PUT', body: { group_id: null } });
+    showMsg('已移出');
+    await loadAll();
+    showMembers(gid);
+  } catch (e) { showMsg(e.message, false); }
+}
+
+function showCreateModal() {
+  showModal('新建团', [
+    { label: '团名', key: 'name', required: true },
+    { label: '描述（可选）', key: 'description', type: 'textarea' }
+  ], async (data) => {
+    await api('/members/groups', { method: 'POST', body: data });
+    showMsg('创建成功');
+    await loadAll();
+  });
+}
+
+function showEditModal(gid) {
+  const g = groups.find(x => x.id === gid);
+  if (!g) return;
+  const memberOpts = allMembers.filter(m => m.status !== '离盟').map(m => ({ value: m.id, label: m.nickname + ' (' + m.game_id + ')' }));
+  showModal('编辑 ' + g.name, [
+    { label: '团名', key: 'name', value: g.name, required: true },
+    { label: '描述', key: 'description', value: g.description || '', type: 'textarea' },
+    { label: '团长', key: 'leader_id', value: g.leader_id || '', type: 'select', options: [{ value: '', label: '不指定' }, ...memberOpts] }
+  ], async (data) => {
+    data.leader_id = data.leader_id ? Number(data.leader_id) : null;
+    await api('/members/groups/' + gid, { method: 'PUT', body: data });
+    showMsg('保存成功');
+    await loadAll();
+  });
+}
+
+function showAssignModal(gid) {
+  const g = groups.find(x => x.id === gid);
+  if (!g) return;
+  const unassigned = allMembers.filter(m => !m.group_id && m.status !== '离盟');
+  const fromOther = allMembers.filter(m => m.group_id && m.group_id !== gid && m.status !== '离盟');
+  const opts = [
+    ...unassigned.map(m => ({ value: m.id, label: '🆕 ' + m.nickname + ' (' + m.game_id + ') - 未分组' })),
+    ...fromOther.map(m => ({ value: m.id, label: m.nickname + ' (' + m.game_id + ') - ' + (groups.find(g => g.id === m.group_id)?.name || '?') }))
+  ];
+  const modal = document.createElement('div');
+  modal.className = 'modal-bg';
+  modal.innerHTML = '<div class="modal" style="max-width:480px">'
+    + '<div class="modal-header"><b>添加成员到 ' + esc(g.name) + '</b><button onclick="this.closest(\'.modal-bg\').remove()" style="background:none;border:none;color:#94A3B8;cursor:pointer;font-size:1.2rem">✕</button></div>'
+    + '<div class="modal-body">'
+    + (opts.length
+      ? '<div class="field"><label>选择成员（可多选）</label>'
+        + '<div style="max-height:300px;overflow-y:auto;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:8px">'
+        + opts.map(o => '<label class="checkbox-label" style="padding:6px 8px;border-radius:6px"><input type="checkbox" value="' + o.value + '"> ' + esc(o.label) + '</label>').join('')
+        + '</div></div>'
+      : '<div class="empty">所有成员都已分组</div>')
+    + '</div>'
+    + '<div class="modal-footer"><button class="btn btn-secondary" onclick="this.closest(\'.modal-bg\').remove()">取消</button>'
+    + '<button class="btn btn-primary" onclick="doAssign(' + gid + ',this)">确认添加</button></div>'
+    + '</div>';
+  document.body.appendChild(modal);
+}
+
+async function doAssign(gid, btn) {
+  const modal = btn.closest('.modal-bg');
+  const checked = [...modal.querySelectorAll('input[type=checkbox]:checked')].map(c => Number(c.value));
+  if (!checked.length) { showMsg('请勾选成员', false); return; }
+  try {
+    await api('/members/groups/' + gid + '/assign', { method: 'POST', body: { member_ids: checked } });
+    modal.remove();
+    showMsg('已添加 ' + checked.length + ' 人');
+    await loadAll();
+  } catch (e) { showMsg(e.message, false); }
+}
+
+async function deleteGroup(gid) {
+  const g = groups.find(x => x.id === gid);
+  if (!g) return;
+  if (g.member_count > 0) { showMsg('团内仍有 ' + g.member_count + ' 人，请先移出成员', false); return; }
+  if (!confirm('确认删除「' + g.name + '」？')) return;
+  try {
+    await api('/members/groups/' + gid, { method: 'DELETE' });
+    showMsg('已删除');
+    await loadAll();
+  } catch (e) { showMsg(e.message, false); }
+}
+
+function renderUnassigned() {
+  const el = document.getElementById('tab-unassigned');
+  const unassigned = allMembers.filter(m => !m.group_id && m.status !== '离盟');
+  if (!unassigned.length) { el.innerHTML = '<div class="empty">所有成员都已分组 ✓</div>'; return; }
+  el.innerHTML = '<div class="card mb-4"><div class="card-title mb-3">未分组成员 <span class="badge">' + unassigned.length + '</span></div>'
+    + '<div class="table-wrap"><table><thead><tr><th>昵称</th><th>游戏ID</th><th>状态</th><th>累计军功</th><th>操作</th></tr></thead><tbody>'
+    + unassigned.map(m => '<tr><td class="font-bold">' + esc(m.nickname) + '</td><td>' + esc(m.game_id) + '</td>'
+      + '<td><span class="tag ' + statusTag(m.status) + '">' + m.status + '</span></td>'
+      + '<td>' + m.total_merit + '</td>'
+      + '<td><select onchange="quickAssign(' + m.id + ',this.value)" style="width:auto;min-width:100px;padding:4px 8px;font-size:0.75rem">'
+      + '<option value="">分配到团...</option>'
+      + groups.map(g => '<option value="' + g.id + '">' + esc(g.name) + '</option>').join('')
+      + '</select></td></tr>'
+    ).join('') + '</tbody></table></div></div>';
+}
+
+async function quickAssign(mid, gid) {
+  if (!gid) return;
+  try {
+    await api('/members/groups/' + gid + '/assign', { method: 'POST', body: { member_ids: [mid] } });
+    const g = groups.find(x => x.id == gid);
+    showMsg('已分配到 ' + (g ? g.name : '团'));
+    await loadAll();
+    renderUnassigned();
+  } catch (e) { showMsg(e.message, false); }
+}
+
+function statusTag(s) {
+  const m = { '活跃': 'tag-green', '休眠': 'tag-gray', '预备': 'tag-blue', '离盟': 'tag-gray' };
+  return m[s] || 'tag-gray';
+}
+
+function showModal(title, fields, onSave) {
+  const modal = document.createElement('div');
+  modal.className = 'modal-bg';
+  let html = '<div class="modal"><div class="modal-header"><b>' + esc(title) + '</b><button onclick="this.closest(\'.modal-bg\').remove()" style="background:none;border:none;color:#94A3B8;cursor:pointer;font-size:1.2rem">✕</button></div><div class="modal-body">';
+  fields.forEach(f => {
+    html += '<div class="field"><label>' + f.label + (f.required ? ' *' : '') + '</label>';
+    if (f.type === 'textarea') {
+      html += '<textarea id="f-' + f.key + '" rows="3">' + esc(f.value || '') + '</textarea>';
+    } else if (f.type === 'select') {
+      html += '<select id="f-' + f.key + '">' + (f.options || []).map(o => '<option value="' + o.value + '"' + (o.value == f.value ? ' selected' : '') + '>' + esc(o.label) + '</option>').join('') + '</select>';
+    } else {
+      html += '<input id="f-' + f.key + '" value="' + esc(f.value || '') + '">';
+    }
+    html += '</div>';
+  });
+  html += '</div><div class="modal-footer"><button class="btn btn-secondary" onclick="this.closest(\'.modal-bg\').remove()">取消</button><button class="btn btn-primary" id="modal-save">保存</button></div></div>';
+  modal.innerHTML = html;
+  document.body.appendChild(modal);
+  modal.querySelector('#modal-save').onclick = async () => {
+    const data = {};
+    for (const f of fields) {
+      const el = modal.querySelector('#f-' + f.key);
+      data[f.key] = el.value.trim();
+      if (f.required && !data[f.key]) { showMsg('请填写' + f.label, false); return; }
+    }
+    try { await onSave(data); modal.remove(); } catch (e) { showMsg(e.message, false); }
+  };
+}
+
+function esc(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+
+// Init
+loadAll().catch(e => showMsg(e.message, false));
+</script>
+</body>
+</html>
